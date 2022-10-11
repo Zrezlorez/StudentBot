@@ -1,6 +1,8 @@
 package org.algiri;
 
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -12,14 +14,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser {
-    static List<String> days = new ArrayList<>(){{
-        add("Рџ Рћ Рќ Р• Р” Р• Р› Р¬ Рќ Р Рљ");
-        add("Р’ Рў Рћ Р  Рќ Р Рљ");
-        add("РЎ Р  Р• Р” Рђ");
-        add("Р§ Р• Рў Р’ Р• Р  Р“");
-        add("Рџ РЇ Рў Рќ Р Р¦ Рђ");
-        add("РЎ РЈ Р‘ Р‘ Рћ Рў Рђ");
+    public static List<String> days = new ArrayList<>(){{
+        add("П О Н Е Д Е Л Ь Н И К");
+        add("В Т О Р Н И К");
+        add("С Р Е Д А");
+        add("Ч Е Т В Е Р Г");
+        add("П Я Т Н И Ц А");
+        add("С У Б Б О Т А");
     }};
+    @SneakyThrows
     public static void parse(Statement user) {
         Workbook wb;
         try {
@@ -37,6 +40,9 @@ public class Parser {
         for (int i = 1; i<77; i++) {
             List<String> lessons = new ArrayList<>();
             boolean isNumerator = i%2==0;
+            if((i>38 && i<52) || i>64) {
+                isNumerator = i%2==1;
+            }
             for(Cell cell : wb.getSheetAt(0).getRow(i)) {
                 int index = cell.getColumnIndex();
                 switch (index){
@@ -56,23 +62,23 @@ public class Parser {
                         }
                         StringBuilder value = new StringBuilder(cell.getStringCellValue().trim()
                                 .replaceAll("\\s+", " ")
-                                .replaceAll("\\s([Рђ-РЇРЃ])", " $1"));
+                                .replaceAll("\\s([А-ЯЁ])", " $1"));
 
-                        if(Pattern.compile("Р»РµРє|РєСѓР»СЊС‚СѓСЂР°").matcher(value.toString()).find()) {
+                        if(Pattern.compile("лек|культура").matcher(value.toString()).find()) {
                             for(int x = 0; x<5; x++)
                                 lessons.add(value.toString());
                             continue;
                         }
-                        if(value.toString().contains("РРЅРѕСЃС‚СЂР°РЅРЅС‹Р№")) {
-                            Matcher matcher = Pattern.compile("[0-9]+[Рђ-СЏ ]+/[0-9Рђ-СЏ]+").matcher(value.toString());
-                            value = new StringBuilder("РРЅРѕСЃС‚СЂР°РЅРЅС‹Р№ СЏР·С‹Рє");
+                        if(value.toString().contains("Иностранный")) {
+                            Matcher matcher = Pattern.compile("[0-9]+[А-я ]+/[0-9А-я]+").matcher(value.toString());
+                            value = new StringBuilder("Иностранный язык");
                             while (matcher.find()) {
                                 value.append(" - ").append(matcher.group(0));
                             }
                             lessons.add(value.toString());
                             continue;
                         }
-                        lessons.add(Pattern.compile(".[Р»Р›]Р°Р±").matcher(value.toString()).replaceAll("\nР»Р°Р±"));
+                        lessons.add(Pattern.compile(".[лЛ]аб").matcher(value.toString()).replaceAll("\nлаб"));
 
                     }
                 }
@@ -81,12 +87,7 @@ public class Parser {
                     "day, timestart, timeend, is211, is212, is213, is214, is215, \"isNumerator\")" +
                     " VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', %b);", day, timestart, timeend,
                     lessons.get(0),  lessons.get(1), lessons.get(2), lessons.get(3), lessons.get(4), isNumerator);
-            try {
-                user.execute(sql);
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-
+            user.execute(sql);
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.algiri;
+package org.algiri.bots;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -11,11 +11,14 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.algiri.DataBase;
+
+import static org.algiri.Main.bot;
 
 @RequiredArgsConstructor
 public class TgBot extends AbstractBot {
     private final DataBase bd;
-    private final TelegramBot bot = new TelegramBot("1116496780:AAH8HZ8kDNoSQW3LNXKM8ladh434hCJfEls");
+
 
     @Override
     public void run(){

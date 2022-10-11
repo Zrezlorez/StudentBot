@@ -15,8 +15,9 @@ public class DataBase {
         Connection db = DriverManager.getConnection("jdbc:postgresql:postgres", "postgres", "12111980");
         user = db.createStatement();
     }
+
     @SneakyThrows
-    List<String> getUserData(String data){
+    public List<String> getUserData(String data){
     List<String> result = new ArrayList<>();
         ResultSet rs = user.executeQuery("SELECT * FROM users " + data);
         while (rs.next()){
@@ -25,8 +26,9 @@ public class DataBase {
         }
         return result;
     }
+
     @SneakyThrows
-    List<String> getTimeTableData(String data){
+    public List<String> getTimeTableData(String data){
         List<String> result = new ArrayList<>();
         ResultSet rs = user.executeQuery("SELECT * FROM timetable " + data);
         while (rs.next()){
@@ -37,13 +39,15 @@ public class DataBase {
 
         return result;
     }
+
     @SneakyThrows
-    void insertUsersData(long id, String name, boolean isVk) {
+    public void insertUsersData(long id, String name, boolean isVk) {
         user.execute(
                 String.format("INSERT INTO public.users(id, \"group\", name, \"isVk\") VALUES (%d, '?', '%s', %b);", id, name, isVk));
     }
+
     @SneakyThrows
-    void updateUsersData(long id, String data){
+    public void updateUsersData(long id, String data){
         user.execute(
                 String.format("UPDATE users SET \"group\" = '%s' WHERE id = %d;", data, id));
     }

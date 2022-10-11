@@ -1,9 +1,12 @@
 package org.algiri;
 
 
+import com.pengrad.telegrambot.TelegramBot;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
+import org.algiri.bots.TgBot;
+import org.algiri.bots.VkBot;
 
 
 import java.util.*;
@@ -12,31 +15,30 @@ import java.util.concurrent.Executors;
 
 
 public class Main {
-    // токен и айди группы вк
-    public static final String TOKEN = "vk1.a.9AQs2ozEmJPOItH-rRjTytJRVmgJkoWkeAWHzVZWUXubclk4B-InLeqbEBYKrYVu44__jISNwYGyKCruFl9TBPF3tGDXAnRZm-YQkBLndKRcI7_wKZR6LlFNcY2N_i5A7z2kEuTpnzqhlJ2bMya1XNlfXoBWv9Y3Aw8cuKJXUMeoHcQcBz_1D6OgmjOYM7qd";
-    public static final int GROUP_ID = 216410844;
     // рандом для случайного id сообщения
     public static final Random RAMDOM = new Random();
+    // клас тг
+    public static final TelegramBot bot = new TelegramBot("1116496780:AAH8HZ8kDNoSQW3LNXKM8ladh434hCJfEls");
     // класс вк
     public static VkApiClient vk = new VkApiClient(HttpTransportClient.getInstance());
-
     // класс группы
-    public static GroupActor group = new GroupActor(GROUP_ID, TOKEN);
+    public static GroupActor group = new GroupActor(216410844, "vk1.a.9AQs2ozEmJPOItH-rRjTytJRVmgJkoWkeAWHzVZWUXubclk4B-InLeqbEBYKrYVu44__jISNwYGyKCruFl9TBPF3tGDXAnRZm-YQkBLndKRcI7_wKZR6LlFNcY2N_i5A7z2kEuTpnzqhlJ2bMya1XNlfXoBWv9Y3Aw8cuKJXUMeoHcQcBz_1D6OgmjOYM7qd");
 
 
 
 
     public static void main(String[] args) {
-        //Parser.parse(bd.user);
+
         DataBase bd = new DataBase();
         VkBot vkBot = new VkBot(bd);
         TgBot tgBot = new TgBot(bd);
         System.out.println("\nBot enabled");
 
-
+        Parser.parse(bd.user);
         ExecutorService tgThread = Executors.newSingleThreadExecutor();
         ExecutorService vkThread = Executors.newSingleThreadExecutor();
         tgThread.execute(tgBot::run);
         vkThread.execute(vkBot::run);
+
     }
 }

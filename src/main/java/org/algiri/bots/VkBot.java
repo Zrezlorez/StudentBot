@@ -1,10 +1,11 @@
-package org.algiri;
+package org.algiri.bots;
 
 import com.vk.api.sdk.objects.messages.*;
 import com.vk.api.sdk.objects.users.responses.GetResponse;
 import com.vk.api.sdk.queries.messages.MessagesGetLongPollHistoryQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.algiri.DataBase;
 
 import java.util.*;
 

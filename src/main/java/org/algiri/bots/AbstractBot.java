@@ -1,4 +1,7 @@
-package org.algiri;
+package org.algiri.bots;
+
+import org.algiri.DataBase;
+import org.algiri.Parser;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -33,7 +36,7 @@ public abstract class AbstractBot {
 
     public void bot(String mes, long userId, DataBase bd, boolean isVk){
         List<String> res = bd.getUserData("WHERE id = " + userId);
-        var keyboard= createKeyboard(new String[]{"Сейчас"}, new String[]{"Сегодня", "Завтра"});
+        var keyboard= createKeyboard(new String[]{"Сейчас", "Неделя"}, new String[]{"Сегодня", "Завтра"});
         try {
             if (res.isEmpty()) {
                 bd.insertUsersData(userId, getName(userId), isVk);
@@ -57,6 +60,7 @@ public abstract class AbstractBot {
         int today = LocalDate.now().getDayOfWeek().getValue()-1;
         Date now = new Date();
         boolean isCommand = false;
+        boolean isWeek = false;
         String sql = "";
         try {
             switch (mes.toLowerCase()) {
@@ -92,7 +96,12 @@ public abstract class AbstractBot {
                             isNumerator(now, numeratorDate.getTime()), today+1);
                     isCommand = true;
                 }
-
+                case "неделя" -> {
+                    sql = String.format("WHERE \"isNumerator\" = %b ORDER BY day, timestart",
+                            isNumerator(now, numeratorDate.getTime()));
+                    isCommand = true;
+                    isWeek = true;
+                }
                 case "поменять группу", "сменить группу", "сбросить группу", "сбросить" -> {
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
@@ -101,9 +110,12 @@ public abstract class AbstractBot {
             }
             if(isCommand){
                 List<String> info = bd.getTimeTableData(sql);
-                if(info.isEmpty())
+                String timetable = getStringTimetable(info, res.get(1), isWeek);
+                if(timetable.isEmpty()) {
                     send("Сейчас пар нет", userId);
-                send(getStringTimetable(info, res.get(1)), userId, keyboard);
+                    return;
+                }
+                send(timetable, userId, keyboard);
             }
 
 
@@ -115,9 +127,14 @@ public abstract class AbstractBot {
 
 
 
-    private static String getStringTimetable(List<String> list, String group) {
+    private static String getStringTimetable(List<String> list, String group, boolean isWeek) {
         StringBuilder result = new StringBuilder();
+        int oldday = -1;
         for (int i = 0; i<list.size(); i+=9) {
+            if(isWeek && Integer.parseInt(list.get(i))!=oldday) {
+                oldday++;
+                result.append(Parser.days.get(oldday).trim()).append("\n\n");
+            }
             if(list.get(i+getIntByGroup(group)).equals("-"))
                 continue;
             result.append(String.format("%s - %s: %s\n\n", list.get(i+1).substring(0, 5), list.get(i+2).substring(0, 5), list.get(i+getIntByGroup(group))));
