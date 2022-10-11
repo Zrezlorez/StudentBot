@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+}
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.algiri.Main'
+        )
+    }
+}
+group 'org.algiri'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("com.vk.api:sdk:1.0.14") {
+        exclude group: 'org.apache.logging.log4j'
+    }
+    implementation 'org.postgresql:postgresql:42.5.0'
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'com.github.pengrad:java-telegram-bot-api:6.2.0'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+}
+
+test {
+    useJUnitPlatform()
+}
