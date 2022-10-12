@@ -63,9 +63,9 @@ public class VkBot extends AbstractBot  {
         List<KeyboardButton> line1 = new ArrayList<>();
         List<KeyboardButton> line2 = new ArrayList<>();
         for(var z: s_line1)
-            line1.add(new KeyboardButton().setAction(new KeyboardButtonAction().setLabel(z).setType(TemplateActionTypeNames.TEXT)).setColor(KeyboardButtonColor.POSITIVE));
+            line1.add(new KeyboardButton().setAction(new KeyboardButtonAction().setLabel(z).setType(TemplateActionTypeNames.TEXT)).setColor(KeyboardButtonColor.DEFAULT));
         for(var z: s_line2)
-            line2.add(new KeyboardButton().setAction(new KeyboardButtonAction().setLabel(z).setType(TemplateActionTypeNames.TEXT)).setColor(KeyboardButtonColor.POSITIVE));
+            line2.add(new KeyboardButton().setAction(new KeyboardButtonAction().setLabel(z).setType(TemplateActionTypeNames.TEXT)).setColor(KeyboardButtonColor.DEFAULT));
         allKey.add(line1);
         allKey.add(line2);
         keyboard.setButtons(allKey);

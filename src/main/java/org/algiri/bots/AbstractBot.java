@@ -43,7 +43,7 @@ public abstract class AbstractBot {
                 res = bd.getUserData("WHERE id = " + userId);
             }
             if (res.get(1).equals("?")) {
-                if (GROUPNAME_LIST.contains(mes.toLowerCase(Locale.ROOT).replace("\s", ""))) {
+                if (GROUPNAME_LIST.contains(mes.toLowerCase().replace("\s", ""))) {
                     bd.updateUsersData(userId, mes.toLowerCase().replace("\s", ""));
                     send("Ваша группа установлена", userId, keyboard);
                 } else {
@@ -66,7 +66,7 @@ public abstract class AbstractBot {
             switch (mes.toLowerCase()) {
                 case "сейчас" -> {
                     if (today == 6) {
-                        send("Сейчас, по расписанию, законный выходной", userId);
+                        send("Сейчас законный выходной", userId);
                         return;
                     }
 
@@ -78,7 +78,7 @@ public abstract class AbstractBot {
                 }
                 case "сегодня" -> {
                     if (today == 6) {
-                        send("Сегодня воскресенье, какие пары?", userId);
+                        send("Сегодня отдыхаем", userId);
                         return;
                     }
                     sql = String.format("WHERE \"isNumerator\" = %b and day = %d ORDER BY timestart",
@@ -87,7 +87,7 @@ public abstract class AbstractBot {
                 }
                 case "завтра" -> {
                     if (today == 5) {
-                        send("Завтра воскресенье, отдыхай", userId);
+                        send("Завтра воскресенье, пар нет", userId);
                         return;
                     }
                     if (today == 6)
@@ -102,7 +102,7 @@ public abstract class AbstractBot {
                     isCommand = true;
                     isWeek = true;
                 }
-                case "поменять группу", "сменить группу", "сбросить группу", "сбросить" -> {
+                case "сменить группу", "сбросить группу", "сбросить", "сменить" -> {
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
@@ -153,7 +153,6 @@ public abstract class AbstractBot {
             default -> 0;
         };
     }
-
     private boolean isNumerator(Date d1, Date d2) {
         return ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) % 2 == 1;
     }

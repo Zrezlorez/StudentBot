@@ -18,7 +18,7 @@ public class Main {
     // рандом для случайного id сообщения
     public static final Random RAMDOM = new Random();
     // клас тг
-    public static final TelegramBot bot = new TelegramBot("1116496780:AAH8HZ8kDNoSQW3LNXKM8ladh434hCJfEls");
+    public static final TelegramBot bot = new TelegramBot("5524044091:AAHe9Wt7GHqfjf4_mEVKG-WbaDcIEUkF2IY");
     // класс вк
     public static VkApiClient vk = new VkApiClient(HttpTransportClient.getInstance());
     // класс группы
@@ -34,9 +34,10 @@ public class Main {
         TgBot tgBot = new TgBot(bd);
         System.out.println("\nBot enabled");
 
-        Parser.parse(bd.user);
+        //Parser.parse(bd.user);
         ExecutorService tgThread = Executors.newSingleThreadExecutor();
         ExecutorService vkThread = Executors.newSingleThreadExecutor();
+
         tgThread.execute(tgBot::run);
         vkThread.execute(vkBot::run);
 

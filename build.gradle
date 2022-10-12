@@ -4,11 +4,10 @@ plugins {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.algiri.Main'
+                'Main-Class': 'org.algiri.Main'
         )
     }
-}
-group 'org.algiri'
+}group 'org.algiri'
 version '1.0-SNAPSHOT'
 
 repositories {

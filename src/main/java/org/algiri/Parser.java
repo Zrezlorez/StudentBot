@@ -40,7 +40,7 @@ public class Parser {
         for (int i = 1; i<77; i++) {
             List<String> lessons = new ArrayList<>();
             boolean isNumerator = i%2==0;
-            if((i>38 && i<52) || i>64) {
+            if((i>37 && i<52) || i>64) {
                 isNumerator = i%2==1;
             }
             for(Cell cell : wb.getSheetAt(0).getRow(i)) {

@@ -20,7 +20,7 @@ public class DataBase {
     public List<String> getUserData(String data){
     List<String> result = new ArrayList<>();
         ResultSet rs = user.executeQuery("SELECT * FROM users " + data);
-        while (rs.next()){
+        while (rs.next()) {
             for(int i = 1; i<5; i++)
                 result.add(rs.getString(i));
         }
