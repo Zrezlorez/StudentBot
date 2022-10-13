@@ -15,13 +15,13 @@ import java.util.concurrent.Executors;
 
 
 public class Main {
-    // СЂР°РЅРґРѕРј РґР»СЏ СЃР»СѓС‡Р°Р№РЅРѕРіРѕ id СЃРѕРѕР±С‰РµРЅРёСЏ
+    // рандом для случайного id сообщения
     public static final Random RAMDOM = new Random();
-    // РєР»Р°СЃ С‚Рі
+    // класс тг
     public static final TelegramBot bot = new TelegramBot("5524044091:AAHe9Wt7GHqfjf4_mEVKG-WbaDcIEUkF2IY");
-    // РєР»Р°СЃСЃ РІРє
+    // класс вк
     public static VkApiClient vk = new VkApiClient(HttpTransportClient.getInstance());
-    // РєР»Р°СЃСЃ РіСЂСѓРїРїС‹
+    // класс группы
     public static GroupActor group = new GroupActor(216410844, "vk1.a.9AQs2ozEmJPOItH-rRjTytJRVmgJkoWkeAWHzVZWUXubclk4B-InLeqbEBYKrYVu44__jISNwYGyKCruFl9TBPF3tGDXAnRZm-YQkBLndKRcI7_wKZR6LlFNcY2N_i5A7z2kEuTpnzqhlJ2bMya1XNlfXoBWv9Y3Aw8cuKJXUMeoHcQcBz_1D6OgmjOYM7qd");
 
 
@@ -32,9 +32,9 @@ public class Main {
         DataBase bd = new DataBase();
         VkBot vkBot = new VkBot(bd);
         TgBot tgBot = new TgBot(bd);
-        System.out.println("\nBot enabled");
+        System.out.println("\nбот включен");
 
-        //Parser.parse(bd.user);
+        //Parser.parse();
         ExecutorService tgThread = Executors.newSingleThreadExecutor();
         ExecutorService vkThread = Executors.newSingleThreadExecutor();
 

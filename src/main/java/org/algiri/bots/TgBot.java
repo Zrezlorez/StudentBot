@@ -1,6 +1,5 @@
 package org.algiri.bots;
 
-import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -31,7 +30,7 @@ public class TgBot extends AbstractBot {
     private void process(Update update) {
         Message message = update.message();
         if(message==null) return;
-        bot(message.text(), message.chat().id(), bd, false);
+        bot(message.text(), message.chat().id(), bd);
 
     }
 

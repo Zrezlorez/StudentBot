@@ -3,7 +3,6 @@ package org.algiri.bots;
 import org.algiri.DataBase;
 import org.algiri.Parser;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -21,26 +20,20 @@ public abstract class AbstractBot {
 
 
     private static final GregorianCalendar numeratorDate = new GregorianCalendar(2022, Calendar.SEPTEMBER, 5);
-    private static final List<String> GROUPNAME_LIST = new ArrayList<>(){{
-        add("is211");
+    public static final List<String> GROUPNAME_LIST = new ArrayList<>(){{
         add("ис211");
-        add("is212");
         add("ис212");
-        add("is213");
         add("ис213");
-        add("is214");
         add("ис214");
-        add("is215");
         add("ис215");
     }};
 
-    public void bot(String mes, long userId, DataBase bd, boolean isVk){
-        List<String> res = bd.getUserData("WHERE id = " + userId);
-        var keyboard= createKeyboard(new String[]{"Сейчас", "Неделя"}, new String[]{"Сегодня", "Завтра"});
+    public void bot(String mes, long userId, DataBase bd){
+        List<String> res = bd.getUserData(userId);
+        var keyboard= createKeyboard(new String[]{"Сегодня", "Завтра"}, new String[]{"Неделя", "Сбросить"});
         try {
             if (res.isEmpty()) {
-                bd.insertUsersData(userId, getName(userId), isVk);
-                res = bd.getUserData("WHERE id = " + userId);
+                res = bd.insertUsersData(userId, "?", getName(userId));
             }
             if (res.get(1).equals("?")) {
                 if (GROUPNAME_LIST.contains(mes.toLowerCase().replace("\s", ""))) {
@@ -59,31 +52,15 @@ public abstract class AbstractBot {
 
         int today = LocalDate.now().getDayOfWeek().getValue()-1;
         Date now = new Date();
-        boolean isCommand = false;
-        boolean isWeek = false;
-        String sql = "";
+        int function = -1;
         try {
             switch (mes.toLowerCase()) {
-                case "сейчас" -> {
-                    if (today == 6) {
-                        send("Сейчас законный выходной", userId);
-                        return;
-                    }
-
-                    SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-                    String timeNow = formatter.format(now);
-                    sql = String.format("WHERE \"isNumerator\" = %b and day = %d and ((timeend > '%s' and timestart < '%s') or (timestart>'%s' and timeend >'%s')) ORDER BY timestart LIMIT 2",
-                            isNumerator(now, numeratorDate.getTime()), today, timeNow, timeNow, timeNow, timeNow);
-                    isCommand = true;
-                }
                 case "сегодня" -> {
                     if (today == 6) {
                         send("Сегодня отдыхаем", userId);
                         return;
                     }
-                    sql = String.format("WHERE \"isNumerator\" = %b and day = %d ORDER BY timestart",
-                            isNumerator(now, numeratorDate.getTime()), today);
-                    isCommand = true;
+                    function = 1;
                 }
                 case "завтра" -> {
                     if (today == 5) {
@@ -92,25 +69,19 @@ public abstract class AbstractBot {
                     }
                     if (today == 6)
                         today = -1;
-                    sql = String.format("WHERE \"isNumerator\" = %b and day = %d ORDER BY timestart",
-                            isNumerator(now, numeratorDate.getTime()), today+1);
-                    isCommand = true;
+                    function = 1;
+                    today++;
                 }
-                case "неделя" -> {
-                    sql = String.format("WHERE \"isNumerator\" = %b ORDER BY day, timestart",
-                            isNumerator(now, numeratorDate.getTime()));
-                    isCommand = true;
-                    isWeek = true;
-                }
+                case "неделя" -> function = 2;
                 case "сменить группу", "сбросить группу", "сбросить", "сменить" -> {
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
 
             }
-            if(isCommand){
-                List<String> info = bd.getTimeTableData(sql);
-                String timetable = getStringTimetable(info, res.get(1), isWeek);
+            if(function>-1){
+                List<String> info = bd.getTimeTableData(isNumerator(now, numeratorDate.getTime()), today, res.get(1), function);
+                String timetable = getStringTimetable(info, function);
                 if(timetable.isEmpty()) {
                     send("Сейчас пар нет", userId);
                     return;
@@ -120,38 +91,24 @@ public abstract class AbstractBot {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
             send("Ошибка выполнения команд, пожалуйста, обратитесь к разработчику - vk.com/zrezlorez", userId);
         }
     }
 
 
 
-    private static String getStringTimetable(List<String> list, String group, boolean isWeek) {
+    private static String getStringTimetable(List<String> list, int function) {
         StringBuilder result = new StringBuilder();
         int oldday = -1;
-        for (int i = 0; i<list.size(); i+=9) {
-            if(isWeek && Integer.parseInt(list.get(i))!=oldday) {
+        for (int i = 0; i<list.size(); i+=6) {
+            if(function==2 && Integer.parseInt(list.get(i))!=oldday) {
                 oldday++;
                 result.append(Parser.days.get(oldday).trim()).append("\n\n");
             }
-            if(list.get(i+getIntByGroup(group)).equals("-"))
-                continue;
-            result.append(String.format("%s - %s: %s\n\n", list.get(i+1).substring(0, 5), list.get(i+2).substring(0, 5), list.get(i+getIntByGroup(group))));
+            result.append(String.format("%s - %s: %s\n\n", list.get(i+1), list.get(i+2), list.get(i+3)));
         }
 
         return result.toString();
-    }
-
-    private static int getIntByGroup(String group){
-        return switch (group) {
-            case "is211", "ис211" -> 3;
-            case "is212", "ис212" -> 4;
-            case "ис213", "is213" -> 5;
-            case "ис214", "is214" -> 6;
-            case "ис215", "is215" -> 7;
-            default -> 0;
-        };
     }
     private boolean isNumerator(Date d1, Date d2) {
         return ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) % 2 == 1;

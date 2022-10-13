@@ -1,54 +1,87 @@
 package org.algiri;
 
 import lombok.SneakyThrows;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.sql.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataBase {
-    public Statement user;
+    public Sheet timetable;
+    public Sheet users;
 
     @SneakyThrows
     public DataBase(){
-        Class.forName("org.postgresql.Driver");
-        Connection db = DriverManager.getConnection("jdbc:postgresql:postgres", "postgres", "12111980");
-        user = db.createStatement();
+        FileInputStream fileInputStream = new FileInputStream("timetable.xlsx");
+        FileInputStream fileInputStream2 = new FileInputStream("users.xlsx");
+        timetable = new XSSFWorkbook(fileInputStream).getSheetAt(0);
+        users = new XSSFWorkbook(fileInputStream2).getSheetAt(0);
     }
 
     @SneakyThrows
-    public List<String> getUserData(String data){
-    List<String> result = new ArrayList<>();
-        ResultSet rs = user.executeQuery("SELECT * FROM users " + data);
-        while (rs.next()) {
-            for(int i = 1; i<5; i++)
-                result.add(rs.getString(i));
-        }
-        return result;
-    }
-
-    @SneakyThrows
-    public List<String> getTimeTableData(String data){
+    public List<String> getUserData(long userId){
         List<String> result = new ArrayList<>();
-        ResultSet rs = user.executeQuery("SELECT * FROM timetable " + data);
-        while (rs.next()){
-            for(int i = 1; i<10; i++)
-                result.add(rs.getString(i));
+        for(int i = 0; i<users.getLastRowNum(); i++) {
+            if (users.getRow(i).getCell(0).getNumericCellValue()==userId) {
+                result.add(String.valueOf(users.getRow(i).getCell(0).getNumericCellValue()));
+                result.add(users.getRow(i).getCell(1).getStringCellValue());
+                result.add(users.getRow(i).getCell(2).getStringCellValue());
+            }
         }
-
-
         return result;
     }
 
     @SneakyThrows
-    public void insertUsersData(long id, String name, boolean isVk) {
-        user.execute(
-                String.format("INSERT INTO public.users(id, \"group\", name, \"isVk\") VALUES (%d, '?', '%s', %b);", id, name, isVk));
+    public List<String> getTimeTableData(boolean isNumerator, int day, String group, int function) {
+        List<String> result = new ArrayList<>();
+        for(int i = 0; i<timetable.getLastRowNum(); i++) {
+            boolean isNowWeek = timetable.getRow(i).getCell(5).getBooleanCellValue()==isNumerator && timetable.getRow(i).getCell(4).getStringCellValue().equals(group);
+            if (isNowWeek && function==2) {
+                addToResult(result, i);
+            }
+            if (isNowWeek && function==1 && timetable.getRow(i).getCell(0).getNumericCellValue()==day) {
+                addToResult(result, i);
+            }
+        }
+        return result;
+    }
+
+    private void addToResult(List<String> result, int i) {
+        result.add(String.valueOf(Math.round(timetable.getRow(i).getCell(0).getNumericCellValue())));
+        result.add(timetable.getRow(i).getCell(1).getStringCellValue());
+        result.add(timetable.getRow(i).getCell(2).getStringCellValue());
+        result.add(timetable.getRow(i).getCell(3).getStringCellValue());
+        result.add(timetable.getRow(i).getCell(4).getStringCellValue());
+        result.add(String.valueOf(timetable.getRow(i).getCell(5).getBooleanCellValue()));
     }
 
     @SneakyThrows
-    public void updateUsersData(long id, String data){
-        user.execute(
-                String.format("UPDATE users SET \"group\" = '%s' WHERE id = %d;", data, id));
+    public List<String> insertUsersData(long id, String group, String name) {
+        List<String> result = new ArrayList<>();
+        Row newRow = users.createRow(users.getLastRowNum()+1);
+        newRow.createCell(0).setCellValue(id);
+        result.add(String.valueOf(id));
+        newRow.createCell(1).setCellValue(group);
+        result.add(group);
+        newRow.createCell(2).setCellValue(name);
+        result.add(name);
+        FileOutputStream outFile = new FileOutputStream("D:\\users.xlsx");
+        users.getWorkbook().write(outFile);
+        return result;
+    }
+
+    @SneakyThrows
+    public void updateUsersData(long userId, String group) {
+        for(int i = 0; i<users.getLastRowNum(); i++) {
+            if (users.getRow(i).getCell(0).getNumericCellValue()==userId) {
+                users.getRow(i).getCell(1).setCellValue(group);
+                FileOutputStream outFile = new FileOutputStream("D:\\users.xlsx");
+                users.getWorkbook().write(outFile);
+            }
+        }
     }
 }

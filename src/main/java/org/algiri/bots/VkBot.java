@@ -26,7 +26,7 @@ public class VkBot extends AbstractBot  {
 
 
             for (Message message : messages) {
-                bot(message.getText(), message.getPeerId(), bd, true);
+                bot(message.getText(), message.getPeerId(), bd);
             }
             ts = vk.messages().getLongPollServer(group).execute().getTs();
         }
