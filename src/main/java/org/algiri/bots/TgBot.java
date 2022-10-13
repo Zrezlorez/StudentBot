@@ -15,11 +15,10 @@ import org.algiri.DataBase;
 import static org.algiri.Main.bot;
 
 @RequiredArgsConstructor
-public class TgBot extends AbstractBot {
+public class TgBot implements AbstractBot {
     private final DataBase bd;
 
 
-    @Override
     public void run(){
         bot.setUpdatesListener(updates -> {
             updates.forEach(this::process);

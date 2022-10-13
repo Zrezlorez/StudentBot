@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static org.algiri.bots.AbstractBot.GROUPNAME_LIST;
 
 public class Parser {

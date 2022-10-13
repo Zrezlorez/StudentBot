@@ -69,7 +69,7 @@ public class DataBase {
         result.add(group);
         newRow.createCell(2).setCellValue(name);
         result.add(name);
-        FileOutputStream outFile = new FileOutputStream("D:\\users.xlsx");
+        FileOutputStream outFile = new FileOutputStream("users.xlsx");
         users.getWorkbook().write(outFile);
         return result;
     }
@@ -79,7 +79,7 @@ public class DataBase {
         for(int i = 0; i<users.getLastRowNum(); i++) {
             if (users.getRow(i).getCell(0).getNumericCellValue()==userId) {
                 users.getRow(i).getCell(1).setCellValue(group);
-                FileOutputStream outFile = new FileOutputStream("D:\\users.xlsx");
+                FileOutputStream outFile = new FileOutputStream("users.xlsx");
                 users.getWorkbook().write(outFile);
             }
         }

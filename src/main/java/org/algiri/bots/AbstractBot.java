@@ -8,19 +8,17 @@ import java.util.*;
 
 
 
-public abstract class AbstractBot {
+public interface AbstractBot {
 
-    public abstract void send(String mes, long userId);
-    public abstract void send(String mes, long userId, Object keyboard);
-    public abstract Object createKeyboard(String[] s_line1, String[] s_line2);
-    public abstract String getName(long userId);
-    public abstract void run();
-
+    void send(String mes, long userId);
+    void send(String mes, long userId, Object keyboard);
+    Object createKeyboard(String[] s_line1, String[] s_line2);
+    String getName(long userId);
 
 
 
-    private static final GregorianCalendar numeratorDate = new GregorianCalendar(2022, Calendar.SEPTEMBER, 5);
-    public static final List<String> GROUPNAME_LIST = new ArrayList<>(){{
+    GregorianCalendar numeratorDate = new GregorianCalendar(2022, Calendar.SEPTEMBER, 5);
+    List<String> GROUPNAME_LIST = new ArrayList<>(){{
         add("ис211");
         add("ис212");
         add("ис213");
@@ -28,7 +26,7 @@ public abstract class AbstractBot {
         add("ис215");
     }};
 
-    public void bot(String mes, long userId, DataBase bd){
+    default void bot(String mes, long userId, DataBase bd){
         List<String> res = bd.getUserData(userId);
         var keyboard= createKeyboard(new String[]{"Сегодня", "Завтра"}, new String[]{"Неделя", "Сбросить"});
         try {
@@ -55,14 +53,14 @@ public abstract class AbstractBot {
         int function = -1;
         try {
             switch (mes.toLowerCase()) {
-                case "сегодня" -> {
+                case "сегодня", "@parabots сегодня" -> {
                     if (today == 6) {
                         send("Сегодня отдыхаем", userId);
                         return;
                     }
                     function = 1;
                 }
-                case "завтра" -> {
+                case "завтра", "@parabots завтра" -> {
                     if (today == 5) {
                         send("Завтра воскресенье, пар нет", userId);
                         return;
@@ -72,8 +70,8 @@ public abstract class AbstractBot {
                     function = 1;
                     today++;
                 }
-                case "неделя" -> function = 2;
-                case "сменить группу", "сбросить группу", "сбросить", "сменить" -> {
+                case "неделя", "@parabots неделя" -> function = 2;
+                case "сбросить", "@parabots сбросить" -> {
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
