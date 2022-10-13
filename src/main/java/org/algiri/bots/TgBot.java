@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.BaseRequest;
+import com.pengrad.telegrambot.request.GetChat;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,6 @@ public class TgBot implements AbstractBot {
         Message message = update.message();
         if(message==null) return;
         bot(message.text(), message.chat().id(), bd);
-
     }
 
     @Override
@@ -56,6 +56,9 @@ public class TgBot implements AbstractBot {
     @SneakyThrows
     @Override
     public String getName(long userId) {
-        return "ןמכüחמגאעוכü עד";
+        var result = bot.execute(new GetChat(userId));
+        if (result.chat().username()!=null)
+            return result.chat().username();
+        return "בוסוהא עד: " + result.chat().title();
     }
 }

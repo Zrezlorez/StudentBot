@@ -1,7 +1,6 @@
 package org.algiri;
 
 
-import api.longpoll.bots.exceptions.VkApiException;
 import com.pengrad.telegrambot.TelegramBot;
 import org.algiri.bots.TgBot;
 import org.algiri.bots.VkBot;
@@ -13,22 +12,22 @@ import java.util.concurrent.Executors;
 
 
 public class Main {
-    // рандом для случайного id сообщения
-    public static final Random RAMDOM = new Random();
-    // класс тг
+    public static final Random RANDOM = new Random();
+    // основа
     public static final TelegramBot bot = new TelegramBot("5524044091:AAHe9Wt7GHqfjf4_mEVKG-WbaDcIEUkF2IY");
-    // класс вк
+    // тест бот
+    //public static final TelegramBot bot = new TelegramBot("1116496780:AAH8HZ8kDNoSQW3LNXKM8ladh434hCJfEls");
 
 
 
     public static void main(String[] args) {
-
+        //Parser.parse(10);
         DataBase bd = new DataBase();
         VkBot vkBot = new VkBot(bd);
         TgBot tgBot = new TgBot(bd);
         System.out.println("\nбот включен");
 
-        //Parser.parse();
+
         ExecutorService tgThread = Executors.newSingleThreadExecutor();
         ExecutorService vkThread = Executors.newSingleThreadExecutor();
 

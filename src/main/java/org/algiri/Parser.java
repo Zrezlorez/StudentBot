@@ -21,10 +21,10 @@ public class Parser {
         add("С У Б Б О Т А");
     }};
     @SneakyThrows
-    public static void parse() {
+    public static void parse(int beforeGroup) {
         Workbook wb;
         Workbook wb2;
-        FileInputStream fileInputStream = new FileInputStream("");
+        FileInputStream fileInputStream = new FileInputStream("D:\\to1-226-227-ot.xlsx");
         FileInputStream fileInputStream2 = new FileInputStream("timetable.xlsx");
         wb = new XSSFWorkbook(fileInputStream);
         wb2 = new XSSFWorkbook(fileInputStream2);
@@ -33,8 +33,8 @@ public class Parser {
         String timestart = "";
         String timeend  = "";
         Sheet sheet = wb2.getSheetAt(0);
-        int num = 1;
-        for (int i = 1; i<77; i++) {
+        int num = wb2.getSheetAt(0).getLastRowNum();
+        for (int i = 1; i<wb.getSheetAt(0).getLastRowNum(); i++) {
             for(Cell cell : wb.getSheetAt(0).getRow(i)) {
                 int index = cell.getColumnIndex();
                 switch (index) {
@@ -56,8 +56,8 @@ public class Parser {
                                 .replaceAll("\\s([А-ЯЁ])", " $1"));
 
                         if(Pattern.compile("[лЛ]ек|культура").matcher(value.toString()).find()) {
-                            for(int x = 0; x<5; x++)
-                                lessons.put(GROUPNAME_LIST.get(x), value.toString());
+                            for(int x = 0; x<2; x++)
+                                lessons.put(GROUPNAME_LIST.get(x+beforeGroup), value.toString());
                         }
                         if(value.toString().contains("Иностранный")) {
                             Matcher matcher = Pattern.compile("[0-9]+[А-я ]+/[0-9А-я]+").matcher(value.toString());
@@ -65,9 +65,9 @@ public class Parser {
                             while (matcher.find()) {
                                 value.append(" - ").append(matcher.group(0));
                             }
-                            lessons.put(GROUPNAME_LIST.get(cell.getColumnIndex()-2), value.toString());
+                            lessons.put(GROUPNAME_LIST.get(cell.getColumnIndex()-2+beforeGroup), value.toString());
                         }
-                        lessons.put(GROUPNAME_LIST.get(cell.getColumnIndex()-2), Pattern.compile(".[лЛ]аб").matcher(value.toString()).replaceAll("\nлаб"));
+                        lessons.put(GROUPNAME_LIST.get(cell.getColumnIndex()-2+beforeGroup), Pattern.compile(".[лЛ]аб").matcher(value.toString()).replaceAll("\nлаб"));
                         for(int z = 0; z< lessons.size(); z++) {
                             sheet.createRow(num-1).createCell(0).setCellValue(day);
                             sheet.getRow(num-1).createCell(1).setCellValue(timestart);
@@ -80,7 +80,7 @@ public class Parser {
                     }
                 }
             }
-            FileOutputStream outFile = new FileOutputStream("D:\\z.xlsx");
+            FileOutputStream outFile = new FileOutputStream("timetable.xlsx");
             wb2.write(outFile);
         }
     }

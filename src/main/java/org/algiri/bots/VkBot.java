@@ -6,6 +6,7 @@ import api.longpoll.bots.model.objects.additional.Keyboard;
 import api.longpoll.bots.model.objects.additional.buttons.Button;
 import api.longpoll.bots.model.objects.additional.buttons.TextButton;
 import api.longpoll.bots.model.objects.basic.Message;
+import api.longpoll.bots.model.objects.basic.User;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.algiri.DataBase;
@@ -39,7 +40,9 @@ public class VkBot extends LongPollBot implements AbstractBot {
 
     @Override
     public String getAccessToken() {
-        return "vk1.a.9AQs2ozEmJPOItH-rRjTytJRVmgJkoWkeAWHzVZWUXubclk4B-InLeqbEBYKrYVu44__jISNwYGyKCruFl9TBPF3tGDXAnRZm-YQkBLndKRcI7_wKZR6LlFNcY2N_i5A7z2kEuTpnzqhlJ2bMya1XNlfXoBWv9Y3Aw8cuKJXUMeoHcQcBz_1D6OgmjOYM7qd";
+        String testGroup = "vk1.a.Pka1R03PDVhnW8YRw6IAecvMLCYehLqZuapGYTUMzy-fBO8Dpx_3ilh-Xz20MSFerL9MctIuuWjUjkGhgJ7_4ZXfQrdllcjnS4z-ISd0jsiLHsJ60DQzaCpjGHXPh8f-T91mybW6X6cgR0Gc22DQQ2De8bThfox3NalzkFrSWAvHjbmatKa_XbP4FWza6r-I";
+        String mainGroup = "vk1.a.9AQs2ozEmJPOItH-rRjTytJRVmgJkoWkeAWHzVZWUXubclk4B-InLeqbEBYKrYVu44__jISNwYGyKCruFl9TBPF3tGDXAnRZm-YQkBLndKRcI7_wKZR6LlFNcY2N_i5A7z2kEuTpnzqhlJ2bMya1XNlfXoBWv9Y3Aw8cuKJXUMeoHcQcBz_1D6OgmjOYM7qd";
+        return mainGroup;
     }
 
     @SneakyThrows
@@ -49,7 +52,7 @@ public class VkBot extends LongPollBot implements AbstractBot {
                 .send()
                 .setMessage(mes)
                 .setPeerId((int)userId)
-                .setRandomId(RAMDOM.nextInt(10000))
+                .setRandomId(RANDOM.nextInt(10000))
                 .execute();
     }
 
@@ -60,7 +63,7 @@ public class VkBot extends LongPollBot implements AbstractBot {
                 .send()
                 .setMessage(mes)
                 .setPeerId((int)userId)
-                .setRandomId(RAMDOM.nextInt(10000)).setKeyboard((api.longpoll.bots.model.objects.additional.Keyboard) keyboard)
+                .setRandomId(RANDOM.nextInt(10000)).setKeyboard((api.longpoll.bots.model.objects.additional.Keyboard) keyboard)
                 .execute();
 
     }
@@ -79,9 +82,20 @@ public class VkBot extends LongPollBot implements AbstractBot {
         return new Keyboard(allKey);
     }
 
-
+    @SneakyThrows
     @Override
     public String getName(long userId) {
-        return "пользователь вк";
+        if (userId > 2000000000 && userId < 2000001000)
+            return "беседа вк: " + vk.messages.
+                    getConversationsById().
+                    setPeerIds((int)userId).
+                    execute().
+                    getResponse().
+                    getItems().
+                    get(0).
+                    getChatSettings().
+                    getTitle();
+        User user = vk.users.get().setUserIds(String.valueOf(userId)).execute().getResponse().get(0);
+        return user.getFirstName() + " " + user.getLastName();
     }
 }

@@ -24,6 +24,13 @@ public interface AbstractBot {
         add("ис213");
         add("ис214");
         add("ис215");
+        add("то221");
+        add("то222");
+        add("то223");
+        add("то224");
+        add("то225");
+        add("то226");
+        add("то227");
     }};
 
     default void bot(String mes, long userId, DataBase bd){
@@ -53,14 +60,14 @@ public interface AbstractBot {
         int function = -1;
         try {
             switch (mes.toLowerCase()) {
-                case "сегодня", "@parabots сегодня" -> {
+                case "сегодня", "[club216410844|@parabots] сегодня" -> {
                     if (today == 6) {
                         send("Сегодня отдыхаем", userId);
                         return;
                     }
                     function = 1;
                 }
-                case "завтра", "@parabots завтра" -> {
+                case "завтра", "[club216410844|@parabots] завтра" -> {
                     if (today == 5) {
                         send("Завтра воскресенье, пар нет", userId);
                         return;
@@ -70,8 +77,8 @@ public interface AbstractBot {
                     function = 1;
                     today++;
                 }
-                case "неделя", "@parabots неделя" -> function = 2;
-                case "сбросить", "@parabots сбросить" -> {
+                case "неделя", "[club216410844|@parabots] неделя" -> function = 2;
+                case "сбросить", "[club216410844|@parabots] сбросить" -> {
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
