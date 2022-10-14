@@ -62,7 +62,7 @@ public class DataBase {
     @SneakyThrows
     public List<String> insertUsersData(long id, String group, String name) {
         List<String> result = new ArrayList<>();
-        Row newRow = users.createRow(users.getLastRowNum()+1);
+        Row newRow = users.createRow(users.getLastRowNum());
         newRow.createCell(0).setCellValue(id);
         result.add(String.valueOf(id));
         newRow.createCell(1).setCellValue(group);

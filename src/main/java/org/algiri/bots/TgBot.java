@@ -59,6 +59,11 @@ public class TgBot implements AbstractBot {
         var result = bot.execute(new GetChat(userId));
         if (result.chat().username()!=null)
             return result.chat().username();
-        return "·ÂÒÂ‰‡ Ú„: " + result.chat().title();
+        if (result.chat().title()!=null)
+            return "–±–µ—Å–µ–¥–∞ —Ç–≥: " + result.chat().title();
+        return "—Ç–≥: " +
+                result.chat().firstName() +
+                " " +
+                (result.chat().lastName()==null ? "" : result.chat().lastName());
     }
 }

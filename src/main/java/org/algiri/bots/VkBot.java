@@ -85,16 +85,8 @@ public class VkBot extends LongPollBot implements AbstractBot {
     @SneakyThrows
     @Override
     public String getName(long userId) {
-        if (userId > 2000000000 && userId < 2000001000)
-            return "áåñåäà âê: " + vk.messages.
-                    getConversationsById().
-                    setPeerIds((int)userId).
-                    execute().
-                    getResponse().
-                    getItems().
-                    get(0).
-                    getChatSettings().
-                    getTitle();
+        if (userId >= 2000000000 && userId < 2000001000)
+            return "Ð±ÐµÑÐµÐ´Ð° Ð²Ðº";
         User user = vk.users.get().setUserIds(String.valueOf(userId)).execute().getResponse().get(0);
         return user.getFirstName() + " " + user.getLastName();
     }

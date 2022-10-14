@@ -19,23 +19,23 @@ public interface AbstractBot {
 
     GregorianCalendar numeratorDate = new GregorianCalendar(2022, Calendar.SEPTEMBER, 5);
     List<String> GROUPNAME_LIST = new ArrayList<>(){{
-        add("ис211");
-        add("ис212");
-        add("ис213");
-        add("ис214");
-        add("ис215");
-        add("то221");
-        add("то222");
-        add("то223");
-        add("то224");
-        add("то225");
-        add("то226");
-        add("то227");
+        add("РёСЃ211");
+        add("РёСЃ212");
+        add("РёСЃ213");
+        add("РёСЃ214");
+        add("РёСЃ215");
+        add("С‚Рѕ221");
+        add("С‚Рѕ222");
+        add("С‚Рѕ223");
+        add("С‚Рѕ224");
+        add("С‚Рѕ225");
+        add("С‚Рѕ226");
+        add("С‚Рѕ227");
     }};
 
     default void bot(String mes, long userId, DataBase bd){
         List<String> res = bd.getUserData(userId);
-        var keyboard= createKeyboard(new String[]{"Сегодня", "Завтра"}, new String[]{"Неделя", "Сбросить"});
+        var keyboard= createKeyboard(new String[]{"РЎРµРіРѕРґРЅСЏ", "Р—Р°РІС‚СЂР°"}, new String[]{"РќРµРґРµР»СЏ", "РЎР±СЂРѕСЃРёС‚СЊ"});
         try {
             if (res.isEmpty()) {
                 res = bd.insertUsersData(userId, "?", getName(userId));
@@ -43,15 +43,16 @@ public interface AbstractBot {
             if (res.get(1).equals("?")) {
                 if (GROUPNAME_LIST.contains(mes.toLowerCase().replace("\s", ""))) {
                     bd.updateUsersData(userId, mes.toLowerCase().replace("\s", ""));
-                    send("Ваша группа установлена", userId, keyboard);
+                    send("Р’Р°С€Р° РіСЂСѓРїРїР° СѓСЃС‚Р°РЅРѕРІР»РµРЅР°", userId, keyboard);
                 } else {
-                    send("Введите свою группу (например: ис211)", userId);
+                    send("Р’РІРµРґРёС‚Рµ СЃРІРѕСЋ РіСЂСѓРїРїСѓ (РЅР°РїСЂРёРјРµСЂ: РёСЃ211)", userId);
                     return;
                 }
             }
 
         } catch (Exception e) {
-            send("Ошибка регистрации, пожалуйста, обратитесь к разработчику - vk.com/zrezlorez", userId);
+            send("РћС€РёР±РєР° СЂРµРіРёСЃС‚СЂР°С†РёРё, РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РѕР±СЂР°С‚РёС‚РµСЃСЊ Рє СЂР°Р·СЂР°Р±РѕС‚С‡РёРєСѓ - vk.com/zrezlorez", userId);
+            send(e.getMessage(), userId);
         }
 
 
@@ -60,16 +61,16 @@ public interface AbstractBot {
         int function = -1;
         try {
             switch (mes.toLowerCase()) {
-                case "сегодня", "[club216410844|@parabots] сегодня" -> {
+                case "СЃРµРіРѕРґРЅСЏ", "[club216410844|@parabots] СЃРµРіРѕРґРЅСЏ" -> {
                     if (today == 6) {
-                        send("Сегодня отдыхаем", userId);
+                        send("РЎРµРіРѕРґРЅСЏ РѕС‚РґС‹С…Р°РµРј", userId);
                         return;
                     }
                     function = 1;
                 }
-                case "завтра", "[club216410844|@parabots] завтра" -> {
+                case "Р·Р°РІС‚СЂР°", "[club216410844|@parabots] Р·Р°РІС‚СЂР°" -> {
                     if (today == 5) {
-                        send("Завтра воскресенье, пар нет", userId);
+                        send("Р—Р°РІС‚СЂР° РІРѕСЃРєСЂРµСЃРµРЅСЊРµ, РїР°СЂ РЅРµС‚", userId);
                         return;
                     }
                     if (today == 6)
@@ -77,10 +78,10 @@ public interface AbstractBot {
                     function = 1;
                     today++;
                 }
-                case "неделя", "[club216410844|@parabots] неделя" -> function = 2;
-                case "сбросить", "[club216410844|@parabots] сбросить" -> {
+                case "РЅРµРґРµР»СЏ", "[club216410844|@parabots] РЅРµРґРµР»СЏ" -> function = 2;
+                case "СЃР±СЂРѕСЃРёС‚СЊ", "[club216410844|@parabots] СЃР±СЂРѕСЃРёС‚СЊ" -> {
                     bd.updateUsersData(userId, "?");
-                    send("Ваша группа сброшена, вы можете установить новую", userId);
+                    send("Р’Р°С€Р° РіСЂСѓРїРїР° СЃР±СЂРѕС€РµРЅР°, РІС‹ РјРѕР¶РµС‚Рµ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РЅРѕРІСѓСЋ", userId);
                 }
 
             }
@@ -88,7 +89,7 @@ public interface AbstractBot {
                 List<String> info = bd.getTimeTableData(isNumerator(now, numeratorDate.getTime()), today, res.get(1), function);
                 String timetable = getStringTimetable(info, function);
                 if(timetable.isEmpty()) {
-                    send("Сейчас пар нет", userId);
+                    send("РЎРµР№С‡Р°СЃ РїР°СЂ РЅРµС‚", userId);
                     return;
                 }
                 send(timetable, userId, keyboard);
@@ -96,7 +97,8 @@ public interface AbstractBot {
 
 
         } catch (Exception e) {
-            send("Ошибка выполнения команд, пожалуйста, обратитесь к разработчику - vk.com/zrezlorez", userId);
+            send("РћС€РёР±РєР° РІС‹РїРѕР»РЅРµРЅРёСЏ РєРѕРјР°РЅРґ, РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РѕР±СЂР°С‚РёС‚РµСЃСЊ Рє СЂР°Р·СЂР°Р±РѕС‚С‡РёРєСѓ - vk.com/zrezlorez", userId);
+            send(e.getMessage(), userId);
         }
     }
 

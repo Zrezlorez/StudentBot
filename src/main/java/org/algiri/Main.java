@@ -13,9 +13,9 @@ import java.util.concurrent.Executors;
 
 public class Main {
     public static final Random RANDOM = new Random();
-    // основа
+    // РѕСЃРЅРѕРІР°
     public static final TelegramBot bot = new TelegramBot("5524044091:AAHe9Wt7GHqfjf4_mEVKG-WbaDcIEUkF2IY");
-    // тест бот
+    // С‚РµСЃС‚ Р±РѕС‚
     //public static final TelegramBot bot = new TelegramBot("1116496780:AAH8HZ8kDNoSQW3LNXKM8ladh434hCJfEls");
 
 
@@ -25,8 +25,7 @@ public class Main {
         DataBase bd = new DataBase();
         VkBot vkBot = new VkBot(bd);
         TgBot tgBot = new TgBot(bd);
-        System.out.println("\nбот включен");
-
+        System.out.println("\nР±РѕС‚ РІРєР»СЋС‡РµРЅ");
 
         ExecutorService tgThread = Executors.newSingleThreadExecutor();
         ExecutorService vkThread = Executors.newSingleThreadExecutor();
