@@ -15,6 +15,12 @@ public interface AbstractBot {
     Object createKeyboard(String[] s_line1, String[] s_line2);
     String getName(long userId);
 
+    /* что такое func
+    * 1 = сегодня завтра
+    * 2 = эта неделя
+    * 3 = завтра если сегодня вс
+    * 4 = след неделя
+    * */
 
 
     GregorianCalendar numeratorDate = new GregorianCalendar(2022, Calendar.SEPTEMBER, 5);
@@ -32,7 +38,6 @@ public interface AbstractBot {
         add("то226");
         add("то227");
     }};
-
     default void bot(String mes, long userId, DataBase bd){
         List<String> res = bd.getUserData(userId);
         var keyboard= createKeyboard(new String[]{"Сегодня", "Завтра"}, new String[]{"Неделя", "Сбросить"});
@@ -41,10 +46,11 @@ public interface AbstractBot {
                 res = bd.insertUsersData(userId, "?", getName(userId));
             }
             if (res.get(1).equals("?")) {
+                long convId = Long.parseLong(res.get(0));
                 if (GROUPNAME_LIST.contains(mes.toLowerCase().replace("\s", ""))) {
                     bd.updateUsersData(userId, mes.toLowerCase().replace("\s", ""));
                     send("Ваша группа установлена", userId, keyboard);
-                } else {
+                } else if(convId>2000001000 || convId<2000000000 || Long.parseLong(res.get(0))<0) {
                     send("Введите свою группу (например: ис211)", userId);
                     return;
                 }
@@ -55,41 +61,58 @@ public interface AbstractBot {
             send(e.getMessage(), userId);
         }
 
-
+        boolean isConv = Long.parseLong(res.get(0))<0;
         int today = LocalDate.now().getDayOfWeek().getValue()-1;
         Date now = new Date();
         int function = -1;
         try {
             switch (mes.toLowerCase()) {
-                case "сегодня", "[club216410844|@parabots] сегодня" -> {
+                case "сегодня", "[club216410844|@parabots] сегодня", "/сегодня" -> {
+                    if(isConv && mes.equalsIgnoreCase("сегодня"))
+                        return;
                     if (today == 6) {
                         send("Сегодня отдыхаем", userId);
                         return;
                     }
                     function = 1;
                 }
-                case "завтра", "[club216410844|@parabots] завтра" -> {
+                case "завтра", "[club216410844|@parabots] завтра", "/завтра" -> {
+                    if(isConv &&  mes.equalsIgnoreCase("завтра"))
+                        return;
                     if (today == 5) {
                         send("Завтра воскресенье, пар нет", userId);
                         return;
                     }
-                    if (today == 6)
-                        today = -1;
                     function = 1;
+                    if (today == 6) {
+                        function = 3;
+                        today = -1;
+                    }
+
                     today++;
                 }
-                case "неделя", "[club216410844|@parabots] неделя" -> function = 2;
-                case "сбросить", "[club216410844|@parabots] сбросить" -> {
+                case "неделя", "[club216410844|@parabots] неделя", "/неделя" -> {
+                    if(isConv && mes.equalsIgnoreCase("неделя"))
+                        return;
+                    function = 2;
+                    if (today == 6) {
+                        function = 4;
+                        today = -1;
+                    }
+                }
+                case "сбросить", "[club216410844|@parabots] сбросить", "/сбросить" -> {
+                    if(isConv && mes.equalsIgnoreCase("сбросить"))
+                        return;
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
 
             }
-            if(function>-1){
+            if(function>0){
                 List<String> info = bd.getTimeTableData(isNumerator(now, numeratorDate.getTime()), today, res.get(1), function);
                 String timetable = getStringTimetable(info, function);
                 if(timetable.isEmpty()) {
-                    send("Сейчас пар нет", userId);
+                    send("Вы не установили группу или по вашему запросу нет пар", userId);
                     return;
                 }
                 send(timetable, userId, keyboard);
@@ -108,7 +131,7 @@ public interface AbstractBot {
         StringBuilder result = new StringBuilder();
         int oldday = -1;
         for (int i = 0; i<list.size(); i+=6) {
-            if(function==2 && Integer.parseInt(list.get(i))!=oldday) {
+            if(function%2==0 && Integer.parseInt(list.get(i))!=oldday) {
                 oldday++;
                 result.append(Parser.days.get(oldday).trim()).append("\n\n");
             }

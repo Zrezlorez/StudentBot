@@ -25,9 +25,10 @@ public class DataBase {
     @SneakyThrows
     public List<String> getUserData(long userId){
         List<String> result = new ArrayList<>();
-        for(int i = 0; i<users.getLastRowNum(); i++) {
-            if (users.getRow(i).getCell(0).getNumericCellValue()==userId) {
-                result.add(String.valueOf(users.getRow(i).getCell(0).getNumericCellValue()));
+        for(int i = 0; i<users.getLastRowNum()+1; i++) {
+            long user = (long) users.getRow(i).getCell(0).getNumericCellValue();
+            if (user==userId) {
+                result.add(String.valueOf((long)users.getRow(i).getCell(0).getNumericCellValue()));
                 result.add(users.getRow(i).getCell(1).getStringCellValue());
                 result.add(users.getRow(i).getCell(2).getStringCellValue());
             }
@@ -38,12 +39,15 @@ public class DataBase {
     @SneakyThrows
     public List<String> getTimeTableData(boolean isNumerator, int day, String group, int function) {
         List<String> result = new ArrayList<>();
-        for(int i = 0; i<timetable.getLastRowNum(); i++) {
+        if (function>2) isNumerator=!isNumerator;
+        for(int i = 0; i<timetable.getLastRowNum()+1; i++) {
             boolean isNowWeek = timetable.getRow(i).getCell(5).getBooleanCellValue()==isNumerator && timetable.getRow(i).getCell(4).getStringCellValue().equals(group);
-            if (isNowWeek && function==2) {
+            if(!isNowWeek) continue;
+            if (function%2==0) {
                 addToResult(result, i);
+                continue;
             }
-            if (isNowWeek && function==1 && timetable.getRow(i).getCell(0).getNumericCellValue()==day) {
+            if (timetable.getRow(i).getCell(0).getNumericCellValue()==day) {
                 addToResult(result, i);
             }
         }
@@ -71,17 +75,19 @@ public class DataBase {
         result.add(name);
         FileOutputStream outFile = new FileOutputStream("users.xlsx");
         users.getWorkbook().write(outFile);
+        outFile.close();
         return result;
     }
 
     @SneakyThrows
     public void updateUsersData(long userId, String group) {
-        for(int i = 0; i<users.getLastRowNum(); i++) {
-            if (users.getRow(i).getCell(0).getNumericCellValue()==userId) {
+        for(int i = 0; i<users.getLastRowNum()+1; i++) {
+            if ((long)users.getRow(i).getCell(0).getNumericCellValue()==userId) {
                 users.getRow(i).getCell(1).setCellValue(group);
-                FileOutputStream outFile = new FileOutputStream("users.xlsx");
-                users.getWorkbook().write(outFile);
             }
         }
+        FileOutputStream outFile = new FileOutputStream("users.xlsx");
+        users.getWorkbook().write(outFile);
+        outFile.close();
     }
 }

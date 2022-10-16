@@ -46,6 +46,10 @@ public class TgBot implements AbstractBot {
     }
     @Override
     public Keyboard createKeyboard(String[] s_line1, String[] s_line2) {
+        for (int i=0; i<2; i++) {
+            s_line1[i] = "/" + s_line1[i];
+            s_line2[i] = "/" + s_line2[i];
+        }
         return new ReplyKeyboardMarkup(
                 s_line1,
                 s_line2)
