@@ -20,7 +20,7 @@ public interface AbstractBot {
     * 2 = эта неделя
     * 3 = завтра если сегодня вс
     * 4 = след неделя
-    * */
+    */
 
 
     GregorianCalendar numeratorDate = new GregorianCalendar(2022, Calendar.SEPTEMBER, 5);
@@ -40,7 +40,9 @@ public interface AbstractBot {
     }};
     default void bot(String mes, long userId, DataBase bd){
         List<String> res = bd.getUserData(userId);
-        var keyboard= createKeyboard(new String[]{"Сегодня", "Завтра"}, new String[]{"Неделя", "Сбросить"});
+        var keyboard= createKeyboard(
+                new String[]{"Сегодня", "Завтра", "Неделя"},
+                new String[]{"Сбросить", "Донат"});
         try {
             if (res.isEmpty()) {
                 res = bd.insertUsersData(userId, "?", getName(userId));
@@ -106,8 +108,10 @@ public interface AbstractBot {
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
-
+                case "донат", "[club216410844|@parabots] донат", "/донат" -> send("Вы бы могли поддержать проект материально, это поможет проекту развиваться дальше\n" +
+                        "Сбер: 2202203299972713", userId);
             }
+
             if(function>0){
                 List<String> info = bd.getTimeTableData(isNumerator(now, numeratorDate.getTime()), today, res.get(1), function);
                 String timetable = getStringTimetable(info, function);

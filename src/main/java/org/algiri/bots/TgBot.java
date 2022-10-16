@@ -30,9 +30,9 @@ public class TgBot implements AbstractBot {
     private void process(Update update) {
         Message message = update.message();
         if(message==null) return;
+        send(String.format("%s написал %s", getName(message.chat().id()), message.text()), 1827409284);
         bot(message.text(), message.chat().id(), bd);
     }
-
     @Override
     public void send(String mes, long userId) {
         BaseRequest<SendMessage, SendResponse> request = new SendMessage(userId, mes);
@@ -56,7 +56,6 @@ public class TgBot implements AbstractBot {
                 .oneTimeKeyboard(true)
                 .resizeKeyboard(true);
     }
-
     @SneakyThrows
     @Override
     public String getName(long userId) {
