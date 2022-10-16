@@ -145,6 +145,6 @@ public interface AbstractBot {
         return result.toString();
     }
     private boolean isNumerator(Date d1, Date d2) {
-        return ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) % 2 == 1;
+        return (((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)))/7 % 2 == 0;
     }
 }
