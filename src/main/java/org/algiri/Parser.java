@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static org.algiri.bots.AbstractBot.GROUPNAME_LIST;
 
 public class Parser {
     public static List<String> days = new ArrayList<>(){{
@@ -21,10 +20,10 @@ public class Parser {
         add("С У Б Б О Т А");
     }};
     @SneakyThrows
-    public static void parse(int beforeGroup) {
+    public static void parse(String filename, int groupCount, List<String> groupNameList) {
         Workbook wb;
         Workbook wb2;
-        FileInputStream fileInputStream = new FileInputStream("D:\\to1-226-227-ot.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("D:\\" + filename);
         FileInputStream fileInputStream2 = new FileInputStream("timetable.xlsx");
         wb = new XSSFWorkbook(fileInputStream);
         wb2 = new XSSFWorkbook(fileInputStream2);
@@ -56,8 +55,8 @@ public class Parser {
                                 .replaceAll("\\s([а-я])", " $1"));
 
                         if(Pattern.compile("[Лл]ек|культура").matcher(value.toString()).find()) {
-                            for(int x = 0; x<2; x++)
-                                lessons.put(GROUPNAME_LIST.get(x+beforeGroup), value.toString());
+                            for(int x = 0; x<groupCount; x++)
+                                lessons.put(groupNameList.get(x), value.toString());
                         }
                         if(value.toString().contains("Иностранный")) {
                             Matcher matcher = Pattern.compile("[0-9]+[А-я]+/[0-9А-я]+").matcher(value.toString());
@@ -65,17 +64,17 @@ public class Parser {
                             while (matcher.find()) {
                                 value.append(" - ").append(matcher.group(0));
                             }
-                            lessons.put(GROUPNAME_LIST.get(cell.getColumnIndex()-2+beforeGroup), value.toString());
+                            lessons.put(groupNameList.get(cell.getColumnIndex()-2), value.toString());
                         }
-                        lessons.put(GROUPNAME_LIST.get(cell.getColumnIndex()-2+beforeGroup), Pattern.compile(".[Лл]аб").matcher(value.toString()).replaceAll("\nлаб"));
+                        lessons.put(groupNameList.get(cell.getColumnIndex()-2), Pattern.compile(".[Лл]аб").matcher(value.toString()).replaceAll("\nлаб"));
                         for(int z = 0; z< lessons.size(); z++) {
-                            sheet.createRow(num-1).createCell(0).setCellValue(day);
-                            sheet.getRow(num-1).createCell(1).setCellValue(timestart);
-                            sheet.getRow(num-1).createCell(2).setCellValue(timeend);
-                            sheet.getRow(num-1).createCell(3).setCellValue(lessons.values().stream().toList().get(z));
-                            sheet.getRow(num-1).createCell(4).setCellValue(lessons.keySet().stream().toList().get(z));
-                            sheet.getRow(num-1).createCell(5).setCellValue(cell.getCellStyle().getFillForegroundColor()==0);
                             num++;
+                            sheet.createRow(num).createCell(0).setCellValue(day);
+                            sheet.getRow(num).createCell(1).setCellValue(timestart);
+                            sheet.getRow(num).createCell(2).setCellValue(timeend);
+                            sheet.getRow(num).createCell(3).setCellValue(lessons.values().stream().toList().get(z));
+                            sheet.getRow(num).createCell(4).setCellValue(lessons.keySet().stream().toList().get(z));
+                            sheet.getRow(num).createCell(5).setCellValue(cell.getCellStyle().getFillForegroundColor()==0);
                         }
                     }
                 }

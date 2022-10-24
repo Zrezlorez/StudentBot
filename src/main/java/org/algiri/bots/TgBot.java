@@ -18,8 +18,6 @@ import static org.algiri.Main.bot;
 @RequiredArgsConstructor
 public class TgBot implements AbstractBot {
     private final DataBase bd;
-
-
     public void run(){
         bot.setUpdatesListener(updates -> {
             updates.forEach(this::process);
@@ -41,7 +39,8 @@ public class TgBot implements AbstractBot {
 
     @Override
     public void send(String mes, long userId, Object keyboard) {
-        BaseRequest<SendMessage, SendResponse> request = new SendMessage(userId, mes).replyMarkup((Keyboard) keyboard);
+        BaseRequest<SendMessage, SendResponse> request = new SendMessage(userId, mes).
+                replyMarkup((Keyboard) keyboard);
         bot.execute(request);
     }
     @Override
@@ -50,6 +49,7 @@ public class TgBot implements AbstractBot {
             s_line1[i] = "/" + s_line1[i];
             s_line2[i] = "/" + s_line2[i];
         }
+        s_line1[2] = "/" + s_line1[2];
         return new ReplyKeyboardMarkup(
                 s_line1,
                 s_line2)

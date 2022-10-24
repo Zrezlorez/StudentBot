@@ -13,15 +13,13 @@ import java.util.List;
 public class DataBase {
     public Sheet timetable;
     public Sheet users;
-
     @SneakyThrows
-    public DataBase(){
+    public DataBase() {
         FileInputStream fileInputStream = new FileInputStream("timetable.xlsx");
-        FileInputStream fileInputStream2 = new FileInputStream("users.xlsx");
         timetable = new XSSFWorkbook(fileInputStream).getSheetAt(0);
+        FileInputStream fileInputStream2 = new FileInputStream("users.xlsx");
         users = new XSSFWorkbook(fileInputStream2).getSheetAt(0);
     }
-
     @SneakyThrows
     public List<String> getUserData(long userId){
         List<String> result = new ArrayList<>();
@@ -38,23 +36,24 @@ public class DataBase {
 
     @SneakyThrows
     public List<String> getTimeTableData(boolean isNumerator, int day, String group, int function) {
+
         List<String> result = new ArrayList<>();
         if (function>2) isNumerator=!isNumerator;
         for(int i = 0; i<timetable.getLastRowNum()+1; i++) {
             boolean isNowWeek = timetable.getRow(i).getCell(5).getBooleanCellValue()==isNumerator && timetable.getRow(i).getCell(4).getStringCellValue().equals(group);
             if(!isNowWeek) continue;
             if (function%2==0) {
-                addToResult(result, i);
+                addToResult(timetable, result, i);
                 continue;
             }
             if (timetable.getRow(i).getCell(0).getNumericCellValue()==day) {
-                addToResult(result, i);
+                addToResult(timetable, result, i);
             }
         }
         return result;
     }
 
-    private void addToResult(List<String> result, int i) {
+    private void addToResult(Sheet timetable,List<String> result, int i) {
         result.add(String.valueOf(Math.round(timetable.getRow(i).getCell(0).getNumericCellValue())));
         result.add(timetable.getRow(i).getCell(1).getStringCellValue());
         result.add(timetable.getRow(i).getCell(2).getStringCellValue());
@@ -66,7 +65,7 @@ public class DataBase {
     @SneakyThrows
     public List<String> insertUsersData(long id, String group, String name) {
         List<String> result = new ArrayList<>();
-        Row newRow = users.createRow(users.getLastRowNum());
+        Row newRow = users.createRow(users.getLastRowNum()+1);
         newRow.createCell(0).setCellValue(id);
         result.add(String.valueOf(id));
         newRow.createCell(1).setCellValue(group);

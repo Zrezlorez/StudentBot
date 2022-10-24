@@ -21,17 +21,22 @@ public class Main {
 
 
     public static void main(String[] args) {
-        //Parser.parse(10);
+
+        /*Parser.parse("to1-221-223-ot.xlsx", 3, new ArrayList<>(){{
+            add("group-name");
+        }});*/
+
+
         DataBase bd = new DataBase();
         VkBot vkBot = new VkBot(bd);
         TgBot tgBot = new TgBot(bd);
         System.out.println("\nбот включен");
-
         ExecutorService tgThread = Executors.newSingleThreadExecutor();
         ExecutorService vkThread = Executors.newSingleThreadExecutor();
 
         tgThread.execute(tgBot::run);
         vkThread.execute(vkBot::run);
+
 
     }
 }

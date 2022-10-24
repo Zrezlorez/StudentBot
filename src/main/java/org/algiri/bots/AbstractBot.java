@@ -33,23 +33,25 @@ public interface AbstractBot {
         add("то221");
         add("то222");
         add("то223");
-        add("то224");
-        add("то225");
-        add("то226");
-        add("то227");
+        add("ис224");
+        add("ис225");
     }};
     default void bot(String mes, long userId, DataBase bd){
         List<String> res = bd.getUserData(userId);
+        // создаю клавиатуру
         var keyboard= createKeyboard(
                 new String[]{"Сегодня", "Завтра", "Неделя"},
                 new String[]{"Сбросить", "Донат"});
+        // обработка регистрации пользователя
         try {
+            // если пользоват еля нет в бд
             if (res.isEmpty()) {
                 res = bd.insertUsersData(userId, "?", getName(userId));
             }
+            // если группа не установлена
             if (res.get(1).equals("?")) {
                 long convId = Long.parseLong(res.get(0));
-                if (GROUPNAME_LIST.contains(mes.toLowerCase().replace("\s", ""))) {
+                if (!mes.isEmpty() && GROUPNAME_LIST.contains(mes.toLowerCase().replace("\s", ""))) {
                     bd.updateUsersData(userId, mes.toLowerCase().replace("\s", ""));
                     send("Ваша группа установлена", userId, keyboard);
                 } else if(convId>2000001000 || convId<2000000000 || Long.parseLong(res.get(0))<0) {
@@ -67,11 +69,14 @@ public interface AbstractBot {
         int today = LocalDate.now().getDayOfWeek().getValue()-1;
         Date now = new Date();
         int function = -1;
+        // обрабокта комманд
         try {
             switch (mes.toLowerCase()) {
                 case "сегодня", "[club216410844|@parabots] сегодня", "/сегодня" -> {
+                    // если беседа, то скип
                     if(isConv && mes.equalsIgnoreCase("сегодня"))
                         return;
+                    // если сегодня воскресенье
                     if (today == 6) {
                         send("Сегодня отдыхаем", userId);
                         return;
@@ -79,6 +84,7 @@ public interface AbstractBot {
                     function = 1;
                 }
                 case "завтра", "[club216410844|@parabots] завтра", "/завтра" -> {
+                    // если беседа то скип
                     if(isConv &&  mes.equalsIgnoreCase("завтра"))
                         return;
                     if (today == 5) {
@@ -108,12 +114,15 @@ public interface AbstractBot {
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
-                case "донат", "[club216410844|@parabots] донат", "/донат" -> send("Вы бы могли поддержать проект материально, это поможет проекту развиваться дальше\n" +
+                case "донат", "[club216410844|@parabots] донат", "/донат" ->
+                        send("Вы бы могли поддержать проект материально, это поможет проекту развиваться дальше\n" +
                         "Сбер: 2202203299972713", userId);
             }
 
             if(function>0){
+                // получаю расписание в виде списка
                 List<String> info = bd.getTimeTableData(isNumerator(now, numeratorDate.getTime()), today, res.get(1), function);
+                // создаю выходную строку с расписанием
                 String timetable = getStringTimetable(info, function);
                 if(timetable.isEmpty()) {
                     send("Вы не установили группу или по вашему запросу нет пар", userId);
@@ -133,11 +142,11 @@ public interface AbstractBot {
 
     private static String getStringTimetable(List<String> list, int function) {
         StringBuilder result = new StringBuilder();
-        int oldday = -1;
+        int day = -1;
         for (int i = 0; i<list.size(); i+=6) {
-            if(function%2==0 && Integer.parseInt(list.get(i))!=oldday) {
-                oldday++;
-                result.append(Parser.days.get(oldday).trim()).append("\n\n");
+            if(function%2==0 && day!=Integer.parseInt(list.get(i))) {
+                day = Integer.parseInt(list.get(i));
+                result.append(Parser.days.get(day).trim()).append("\n\n");
             }
             result.append(String.format("%s - %s: %s\n\n", list.get(i+1), list.get(i+2), list.get(i+3)));
         }

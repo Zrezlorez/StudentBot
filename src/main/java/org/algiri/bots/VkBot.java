@@ -42,7 +42,7 @@ public class VkBot extends LongPollBot implements AbstractBot {
     public String getAccessToken() {
         String testGroup = "vk1.a.Pka1R03PDVhnW8YRw6IAecvMLCYehLqZuapGYTUMzy-fBO8Dpx_3ilh-Xz20MSFerL9MctIuuWjUjkGhgJ7_4ZXfQrdllcjnS4z-ISd0jsiLHsJ60DQzaCpjGHXPh8f-T91mybW6X6cgR0Gc22DQQ2De8bThfox3NalzkFrSWAvHjbmatKa_XbP4FWza6r-I";
         String mainGroup = "vk1.a.9AQs2ozEmJPOItH-rRjTytJRVmgJkoWkeAWHzVZWUXubclk4B-InLeqbEBYKrYVu44__jISNwYGyKCruFl9TBPF3tGDXAnRZm-YQkBLndKRcI7_wKZR6LlFNcY2N_i5A7z2kEuTpnzqhlJ2bMya1XNlfXoBWv9Y3Aw8cuKJXUMeoHcQcBz_1D6OgmjOYM7qd";
-        return mainGroup;
+        return testGroup;
     }
 
     @SneakyThrows
