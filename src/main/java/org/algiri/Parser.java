@@ -20,14 +20,14 @@ public class Parser {
         add("С У Б Б О Т А");
     }};
     @SneakyThrows
-    public static void parse(String filename, int groupCount, List<String> groupNameList) {
+    public static void parse(String filename, String... groups) {
         Workbook wb;
         Workbook wb2;
         FileInputStream fileInputStream = new FileInputStream("D:\\" + filename);
         FileInputStream fileInputStream2 = new FileInputStream("timetable.xlsx");
         wb = new XSSFWorkbook(fileInputStream);
         wb2 = new XSSFWorkbook(fileInputStream2);
-
+        List<String> groupNameList = List.of(groups);
         int day = 0;
         String timestart = "";
         String timeend  = "";
@@ -55,8 +55,7 @@ public class Parser {
                                 .replaceAll("\\s([а-я])", " $1"));
 
                         if(Pattern.compile("[Лл]ек|культура").matcher(value.toString()).find()) {
-                            for(int x = 0; x<groupCount; x++)
-                                lessons.put(groupNameList.get(x), value.toString());
+                            for (String s : groupNameList) lessons.put(s, value.toString());
                         }
                         if(value.toString().contains("Иностранный")) {
                             Matcher matcher = Pattern.compile("[0-9]+[А-я]+/[0-9А-я]+").matcher(value.toString());

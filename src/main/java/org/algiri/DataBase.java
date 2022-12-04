@@ -1,6 +1,9 @@
 package org.algiri;
 
 import lombok.SneakyThrows;
+import org.algiri.model.Function;
+import org.algiri.model.Lesson;
+import org.algiri.model.UserData;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -11,71 +14,92 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataBase {
-    public Sheet timetable;
-    public Sheet users;
+
+    private static DataBase INSTANCE;
+    private Sheet timetable;
+    private Sheet users;
     @SneakyThrows
     public DataBase() {
         FileInputStream fileInputStream = new FileInputStream("timetable.xlsx");
         timetable = new XSSFWorkbook(fileInputStream).getSheetAt(0);
         FileInputStream fileInputStream2 = new FileInputStream("users.xlsx");
         users = new XSSFWorkbook(fileInputStream2).getSheetAt(0);
+        fileInputStream.close();
+        fileInputStream2.close();
+    }
+
+    public static DataBase getINSTANCE() {
+        if(INSTANCE == null)
+            INSTANCE = new DataBase();
+        return INSTANCE;
+    }
+
+    @SneakyThrows
+    public UserData getUserData(long userId){
+        UserData data = new UserData();
+        for(int i = 0; i<=users.getLastRowNum(); i++) {
+            long id = (long) users.getRow(i).getCell(0).getNumericCellValue();
+            if (id==userId) {
+                data.setId(id);
+                data.setGroup(users.getRow(i).getCell(1).getStringCellValue());
+                data.setName(users.getRow(i).getCell(2).getStringCellValue());
+                break;
+            }
+        }
+        return data;
     }
     @SneakyThrows
-    public List<String> getUserData(long userId){
-        List<String> result = new ArrayList<>();
+    public List<UserData> getAllUsersData(){
+        List<UserData> result = new ArrayList<>();
         for(int i = 0; i<users.getLastRowNum()+1; i++) {
-            long user = (long) users.getRow(i).getCell(0).getNumericCellValue();
-            if (user==userId) {
-                result.add(String.valueOf((long)users.getRow(i).getCell(0).getNumericCellValue()));
-                result.add(users.getRow(i).getCell(1).getStringCellValue());
-                result.add(users.getRow(i).getCell(2).getStringCellValue());
+            UserData user = new UserData(
+                    (long)users.getRow(i).getCell(0).getNumericCellValue(),
+                    users.getRow(i).getCell(1).getStringCellValue(),
+                    users.getRow(i).getCell(2).getStringCellValue());
+            result.add(user);
+        }
+        return result;
+    }
+    @SneakyThrows
+    public List<Lesson> getTimeTableData(boolean isNumerator, int day, String group, Function function) {
+        if(function == Function.NEXT_WEEK || function == Function.TOMORROW_SUNDAY)
+            isNumerator = !isNumerator;
+        List<Lesson> result = new ArrayList<>();
+        for(int i = 0; i<=timetable.getLastRowNum(); i++) {
+            boolean isGroupWeek = timetable.getRow(i).getCell(5).getBooleanCellValue() == isNumerator && timetable.getRow(i).getCell(4).getStringCellValue().equals(group);
+            if(!isGroupWeek) continue;
+            if (timetable.getRow(i).getCell(0).getNumericCellValue() == day || (function == Function.THIS_WEEK || function == Function.NEXT_WEEK)) {
+                result.add(createLesson(i));
             }
         }
         return result;
     }
 
-    @SneakyThrows
-    public List<String> getTimeTableData(boolean isNumerator, int day, String group, int function) {
-
-        List<String> result = new ArrayList<>();
-        if (function>2) isNumerator=!isNumerator;
-        for(int i = 0; i<timetable.getLastRowNum()+1; i++) {
-            boolean isNowWeek = timetable.getRow(i).getCell(5).getBooleanCellValue()==isNumerator && timetable.getRow(i).getCell(4).getStringCellValue().equals(group);
-            if(!isNowWeek) continue;
-            if (function%2==0) {
-                addToResult(timetable, result, i);
-                continue;
-            }
-            if (timetable.getRow(i).getCell(0).getNumericCellValue()==day) {
-                addToResult(timetable, result, i);
-            }
-        }
-        return result;
-    }
-
-    private void addToResult(Sheet timetable,List<String> result, int i) {
-        result.add(String.valueOf(Math.round(timetable.getRow(i).getCell(0).getNumericCellValue())));
-        result.add(timetable.getRow(i).getCell(1).getStringCellValue());
-        result.add(timetable.getRow(i).getCell(2).getStringCellValue());
-        result.add(timetable.getRow(i).getCell(3).getStringCellValue());
-        result.add(timetable.getRow(i).getCell(4).getStringCellValue());
-        result.add(String.valueOf(timetable.getRow(i).getCell(5).getBooleanCellValue()));
+    private Lesson createLesson(int rowNum) {
+        Lesson lesson = new Lesson();
+        lesson.setDay((int)timetable.getRow(rowNum).getCell(0).getNumericCellValue());
+        lesson.setTimeStart(timetable.getRow(rowNum).getCell(1).getStringCellValue());
+        lesson.setTimeEnd(timetable.getRow(rowNum).getCell(2).getStringCellValue());
+        lesson.setName(timetable.getRow(rowNum).getCell(3).getStringCellValue());
+        lesson.setGroup(timetable.getRow(rowNum).getCell(3).getStringCellValue());
+        lesson.setNumerator(timetable.getRow(rowNum).getCell(5).getBooleanCellValue());
+        return lesson;
     }
 
     @SneakyThrows
-    public List<String> insertUsersData(long id, String group, String name) {
-        List<String> result = new ArrayList<>();
+    public UserData insertUsersData(long id, String group, String name) {
+        UserData user = new UserData();
         Row newRow = users.createRow(users.getLastRowNum()+1);
         newRow.createCell(0).setCellValue(id);
-        result.add(String.valueOf(id));
         newRow.createCell(1).setCellValue(group);
-        result.add(group);
         newRow.createCell(2).setCellValue(name);
-        result.add(name);
+        user.setId(id);
+        user.setGroup(group);
+        user.setName(name);
         FileOutputStream outFile = new FileOutputStream("users.xlsx");
         users.getWorkbook().write(outFile);
         outFile.close();
-        return result;
+        return user;
     }
 
     @SneakyThrows

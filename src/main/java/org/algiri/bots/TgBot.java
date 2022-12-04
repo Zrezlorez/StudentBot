@@ -1,5 +1,6 @@
 package org.algiri.bots;
 
+import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -9,15 +10,11 @@ import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.GetChat;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.algiri.DataBase;
+import static org.algiri.Main.*;
 
-import static org.algiri.Main.bot;
-
-@RequiredArgsConstructor
 public class TgBot implements AbstractBot {
-    private final DataBase bd;
+    public static final TelegramBot bot = new TelegramBot(getToken());
     public void run(){
         bot.setUpdatesListener(updates -> {
             updates.forEach(this::process);
@@ -28,31 +25,36 @@ public class TgBot implements AbstractBot {
     private void process(Update update) {
         Message message = update.message();
         if(message==null) return;
-        send(String.format("%s написал %s", getName(message.chat().id()), message.text()), 1827409284);
-        bot(message.text(), message.chat().id(), bd);
+        if(message.chat().id()!=1827409284)
+            send(String.format("%s написал %s", getName(message.chat().id()), message.text()), 1827409284);
+        bot(message.text(), message.chat().id());
     }
+
+    private static String getToken() {
+        if(isTest)  return "1116496780:AAH8HZ8kDNoSQW3LNXKM8ladh434hCJfEls";
+        return "5524044091:AAHe9Wt7GHqfjf4_mEVKG-WbaDcIEUkF2IY";
+
+    }
+
     @Override
     public void send(String mes, long userId) {
         BaseRequest<SendMessage, SendResponse> request = new SendMessage(userId, mes);
         bot.execute(request);
     }
-
     @Override
-    public void send(String mes, long userId, Object keyboard) {
+    public void send(String mes, long userId, String[]... lines) {
         BaseRequest<SendMessage, SendResponse> request = new SendMessage(userId, mes).
-                replyMarkup((Keyboard) keyboard);
+                replyMarkup(createKeyboard(lines[0], lines[1]));
         bot.execute(request);
     }
-    @Override
-    public Keyboard createKeyboard(String[] s_line1, String[] s_line2) {
-        for (int i=0; i<2; i++) {
-            s_line1[i] = "/" + s_line1[i];
-            s_line2[i] = "/" + s_line2[i];
+    public Keyboard createKeyboard(String[] line1, String[] line2) {
+        for (int i=0; i< line1.length; i++) {
+            line1[i] = "/" + line1[i];
         }
-        s_line1[2] = "/" + s_line1[2];
-        return new ReplyKeyboardMarkup(
-                s_line1,
-                s_line2)
+        for (int i=0; i< line2.length; i++) {
+            line2[i] = "/" + line2[i];
+        }
+        return new ReplyKeyboardMarkup(line1, line2)
                 .oneTimeKeyboard(true)
                 .resizeKeyboard(true);
     }
