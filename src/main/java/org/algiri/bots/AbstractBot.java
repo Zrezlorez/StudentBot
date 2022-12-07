@@ -135,28 +135,20 @@ public interface AbstractBot {
     private static String getStringTimetable(List<Lesson> list, Function function, int today, String pr) {
         StringBuilder result = new StringBuilder();
         int day = -1;
-        String str = "";
+        String str;
         for (Lesson lesson : list) {
             switch (function) {
                 case TEACHER -> {
-                    if(lesson.getDay()==today || lesson.getDay() == today+1 && lesson.getTeacher().toLowerCase().contains(pr)) {
-//                        StringBuilder result = new StringBuilder();
-//                        String is213 = "Группа ис213: 8:30-10:10: Алгоритмы\n\n";
-//                        String is214 = "Группа ис214: 8:30-10:10: Алгоритмы\n\n";
-//                        String is215 = "Группа ис215: 8:30-10:10: Алгоритмы\n\n";
-//                        result.append(is213);
-//                        if(is214.contains(is213.substring(is213.indexOf(": 8:30")))) {
-//                            result.insert(is214.indexOf(": 8:30"), ", ис214");
-//                        }
-//                        else result.append(is214);
-//
-//                        result.append(is215);
+                    if(lesson.getDay()==today && lesson.getTeacher().toLowerCase().contains(pr)) {
                         str = String.format("Группа %s, %s-%s: %s\n\n",
                                 lesson.getGroup(),
                                 lesson.getTimeStart(),
                                 lesson.getTimeEnd(),
                                 lesson.getName());
-
+                        if(result.substring(result.lastIndexOf(",")+1).contains(lesson.getName())) {
+                            result.insert(result.lastIndexOf(","), ", " + lesson.getGroup());
+                        }
+                        else result.append(str);
                     }
                 }
                 case TODAY -> {
