@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 
 
 public class Main {
-    public static boolean isTest = false;
+    public static boolean isTest = true;
     public static void main(String[] args) {
         System.out.println("\nБот включен!");
         ExecutorService tgThread = Executors.newSingleThreadExecutor();

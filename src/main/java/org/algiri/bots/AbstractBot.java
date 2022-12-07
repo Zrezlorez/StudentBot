@@ -5,7 +5,6 @@ import org.algiri.model.Function;
 import org.algiri.Parser;
 import org.algiri.model.Lesson;
 import org.algiri.model.User;
-import org.algiri.model.UserData;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -43,7 +42,6 @@ public interface AbstractBot {
     default void bot(String mes, long userId) {
         boolean isNumerator = getNumerator();
         DataBase bd =  DataBase.getINSTANCE();
-        UserData userData = bd.getUserData(userId);
         User user = new User(mes, userId);
         String[] line1 = {"Сегодня", "Завтра", "Неделя"};
         String[] line2 = {"Сбросить", "Донат"};
@@ -63,12 +61,13 @@ public interface AbstractBot {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT+3"));
         int today = LocalDate.now().getDayOfWeek().getValue()-1;
         Function function = null;
+        String pr = "";
         // обработка команд
         try {
-            switch (mes.toLowerCase()) {
-                case "сегодня", "[club216410844|@parabots] сегодня", "/сегодня" -> {
+            switch (user.getMessage().split(" ")[0]) {
+                case "сегодня" -> {
                     // если беседа, то скип
-                    if(userData.isConv() && mes.equalsIgnoreCase("сегодня"))
+                    if(user.isConv() && mes.equalsIgnoreCase("сегодня"))
                         return;
                     // если сегодня воскресенье
                     if (today == 6) {
@@ -77,9 +76,9 @@ public interface AbstractBot {
                     }
                     function = Function.TODAY;
                 }
-                case "завтра", "[club216410844|@parabots] завтра", "/завтра" -> {
+                case "завтра" -> {
                     // если беседа, то скип
-                    if(userData.isConv() &&  mes.equalsIgnoreCase("завтра"))
+                    if(user.isConv() &&  mes.equalsIgnoreCase("завтра"))
                         return;
                     if (today == 5) {
                         send("Завтра воскресенье, пар нет", userId);
@@ -88,25 +87,27 @@ public interface AbstractBot {
                     function = Function.TOMORROW;
                     if (today == 6) {
                         function = Function.TOMORROW_SUNDAY;
-                        today = -1;
                     }
-                    today++;
                 }
-                case "неделя", "[club216410844|@parabots] неделя", "/неделя" -> {
-                    if(userData.isConv() && mes.equalsIgnoreCase("неделя"))
+                case "неделя" -> {
+                    if(user.isConv() && mes.equalsIgnoreCase("неделя"))
                         return;
                     function = Function.THIS_WEEK;
                     if (today == 6) {
                         function = Function.NEXT_WEEK;
                     }
                 }
-                case "сбросить", "[club216410844|@parabots] сбросить", "/сбросить" -> {
-                    if(userData.isConv() && mes.equalsIgnoreCase("сбросить"))
+                case "препод" -> {
+                    pr = user.getMessage().split(" ")[1];
+                    function = Function.TEACHER;
+                }
+                case "сбросить" -> {
+                    if(user.isConv() && mes.equalsIgnoreCase("сбросить"))
                         return;
                     bd.updateUsersData(userId, "?");
                     send("Ваша группа сброшена, вы можете установить новую", userId);
                 }
-                case "донат", "[club216410844|@parabots] донат", "/донат" ->
+                case "донат" ->
                         send("""
                                 Вы бы могли поддержать проект материально, это поможет ему развиваться дальше
                                 Сбер: 2202203299972713
@@ -114,8 +115,8 @@ public interface AbstractBot {
 
             }
             if(function!=null) {
-                List<Lesson> info = bd.getTimeTableData(isNumerator, today, userData.getGroup(), function);
-                String timetable = getStringTimetable(info, function);
+                List<Lesson> info = bd.getTimeTableData(isNumerator, function, user.getUserData().getGroup());
+                String timetable = getStringTimetable(info, function, today, pr);
                 if(timetable.isEmpty()) {
                     send("По вашему запросу нет пар", userId);
                     return;
@@ -131,21 +132,64 @@ public interface AbstractBot {
     }
 
 
-    private static String getStringTimetable(List<Lesson> list, Function function) {
+    private static String getStringTimetable(List<Lesson> list, Function function, int today, String pr) {
         StringBuilder result = new StringBuilder();
         int day = -1;
+        String str = "";
         for (Lesson lesson : list) {
-            if ((function == Function.THIS_WEEK || function == Function.NEXT_WEEK) && day != lesson.getDay()) {
-                day = lesson.getDay();
-                result.append(Parser.days.get(lesson.getDay()).trim()).append("\n\n");
-            }
-            result.append(String.format("%s - %s: %s\n\n",
-                    lesson.getTimeStart(),
-                    lesson.getTimeEnd(),
-                    lesson.getName()));
-        }
+            switch (function) {
+                case TEACHER -> {
+                    if(lesson.getDay()==today || lesson.getDay() == today+1 && lesson.getTeacher().toLowerCase().contains(pr)) {
+//                        StringBuilder result = new StringBuilder();
+//                        String is213 = "Группа ис213: 8:30-10:10: Алгоритмы\n\n";
+//                        String is214 = "Группа ис214: 8:30-10:10: Алгоритмы\n\n";
+//                        String is215 = "Группа ис215: 8:30-10:10: Алгоритмы\n\n";
+//                        result.append(is213);
+//                        if(is214.contains(is213.substring(is213.indexOf(": 8:30")))) {
+//                            result.insert(is214.indexOf(": 8:30"), ", ис214");
+//                        }
+//                        else result.append(is214);
+//
+//                        result.append(is215);
+                        str = String.format("Группа %s, %s-%s: %s\n\n",
+                                lesson.getGroup(),
+                                lesson.getTimeStart(),
+                                lesson.getTimeEnd(),
+                                lesson.getName());
 
+                    }
+                }
+                case TODAY -> {
+                    if(lesson.getDay()==today) {
+                        addLesson(result, lesson);
+                    }
+                }
+                case TOMORROW -> {
+                    if(lesson.getDay()==today+1) {
+                        addLesson(result, lesson);
+                    }
+                }
+                case TOMORROW_SUNDAY -> {
+                    if(lesson.getDay()==0)
+                        addLesson(result, lesson);
+                }
+                case THIS_WEEK, NEXT_WEEK -> {
+                    if(lesson.getDay() != day) {
+                        day = lesson.getDay();
+                        result.append(Parser.days.get(lesson.getDay()).trim()).append("\n\n");
+                    }
+                    addLesson(result, lesson);
+                }
+            }
+        }
         return result.toString();
+    }
+
+    private static void addLesson(StringBuilder result, Lesson lesson) {
+        result.append(String.format("%s - %s: %s\n\n",
+                lesson.getTimeStart(),
+                lesson.getTimeEnd(),
+                lesson.getName()));
     }
 
     private static boolean getNumerator() {

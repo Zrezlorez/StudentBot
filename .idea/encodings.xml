@@ -3,7 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/main/java/org/algiri/Main.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/org/algiri/Parser.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/algiri/bots/AbstractBot.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/algiri/bots/AbstractBot.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/src/main/java/org/algiri/bots/TgBot.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/org/algiri/bots/VkBot.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />

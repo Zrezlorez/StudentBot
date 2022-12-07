@@ -6,4 +6,5 @@ public enum Function {
     TOMORROW_SUNDAY,
     THIS_WEEK,
     NEXT_WEEK,
+    TEACHER
 }

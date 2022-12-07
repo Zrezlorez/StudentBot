@@ -61,15 +61,17 @@ public class DataBase {
         return result;
     }
     @SneakyThrows
-    public List<Lesson> getTimeTableData(boolean isNumerator, int day, String group, Function function) {
+    public List<Lesson> getTimeTableData(boolean isNumerator, Function function, String group) {
         if(function == Function.NEXT_WEEK || function == Function.TOMORROW_SUNDAY)
             isNumerator = !isNumerator;
         List<Lesson> result = new ArrayList<>();
         for(int i = 0; i<=timetable.getLastRowNum(); i++) {
-            boolean isGroupWeek = timetable.getRow(i).getCell(5).getBooleanCellValue() == isNumerator && timetable.getRow(i).getCell(4).getStringCellValue().equals(group);
-            if(!isGroupWeek) continue;
-            if (timetable.getRow(i).getCell(0).getNumericCellValue() == day || (function == Function.THIS_WEEK || function == Function.NEXT_WEEK)) {
-                result.add(createLesson(i));
+            Lesson lesson = createLesson(i);
+            if(lesson.isNumerator() == isNumerator) {
+                if (function == Function.TEACHER)
+                    result.add(lesson);
+                else if(lesson.getGroup().equals(group))
+                    result.add(lesson);
             }
         }
         return result;
@@ -81,7 +83,7 @@ public class DataBase {
         lesson.setTimeStart(timetable.getRow(rowNum).getCell(1).getStringCellValue());
         lesson.setTimeEnd(timetable.getRow(rowNum).getCell(2).getStringCellValue());
         lesson.setName(timetable.getRow(rowNum).getCell(3).getStringCellValue());
-        lesson.setGroup(timetable.getRow(rowNum).getCell(3).getStringCellValue());
+        lesson.setGroup(timetable.getRow(rowNum).getCell(4).getStringCellValue());
         lesson.setNumerator(timetable.getRow(rowNum).getCell(5).getBooleanCellValue());
         return lesson;
     }
