@@ -14,7 +14,7 @@ import java.util.*;
 public interface AbstractBot {
 
     void send(String mes, long userId);
-    void send(String mes, long userId, String[]... lines);
+    void send(String mes, int messageId, long userId, String[]... lines);
     String getName(long userId);
 
 
@@ -39,17 +39,18 @@ public interface AbstractBot {
         add("лх223");
         add("лх224");
     }};
-    default void bot(String mes, long userId) {
+    default void bot(String mes, int messageId, long userId) {
         boolean isNumerator = getNumerator();
+        if(mes==null) return;
         DataBase bd =  DataBase.getINSTANCE();
         User user = new User(mes, userId);
         String[] line1 = {"Сегодня", "Завтра", "Неделя"};
-        String[] line2 = {"Сбросить", "Донат"};
+        String[] line2 = {"Сбросить", "Донат", "Удалить"};
         // обработка регистрации пользователя
         try {
             String answer = user.register();
             if(answer!=null) {
-                send(answer, userId, line1, line2);
+                send(answer, messageId, userId, line1, line2);
                 return;
             }
 
@@ -101,6 +102,10 @@ public interface AbstractBot {
                     pr = user.getMessage().split(" ")[1];
                     function = Function.TEACHER;
                 }
+                case "удалить" -> {
+                    send("Ваша клавиатура удалена", messageId, userId, new String[]{"0"}, new String[]{"0"});
+                    return;
+                }
                 case "сбросить" -> {
                     if(user.isConv() && mes.equalsIgnoreCase("сбросить"))
                         return;
@@ -121,10 +126,8 @@ public interface AbstractBot {
                     send("По вашему запросу нет пар", userId);
                     return;
                 }
-                send(timetable, userId, line1, line2);
+                send(timetable, messageId, userId, line1, line2);
             }
-
-
         } catch (Exception e) {
             send("Ошибка выполнения команд, пожалуйста, обратитесь к разработчику - vk.com/zrezlorez", userId);
             send(e.getMessage(), userId);

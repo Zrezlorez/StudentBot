@@ -30,7 +30,7 @@ public class VkBot extends LongPollBot implements AbstractBot {
     public void onMessageNew(MessageNew messageNew) {
         Message message = messageNew.getMessage();
         if(message.hasText()) {
-            bot(message.getText(), message.getPeerId());
+            bot(message.getText(), message.getConversationMessageId(), message.getPeerId());
         }
     }
 
@@ -54,7 +54,7 @@ public class VkBot extends LongPollBot implements AbstractBot {
 
     @SneakyThrows
     @Override
-    public void send(String mes, long userId, String[]... lines) {
+    public void send(String mes, int messageId, long userId, String[]... lines) {
         vk.messages
                 .send()
                 .setMessage(mes)
@@ -65,7 +65,6 @@ public class VkBot extends LongPollBot implements AbstractBot {
 
     }
     public Keyboard createKeyboard(String[] line1, String[] line2) {
-
         List<List<Button>> allKey = new ArrayList<>();
         List<Button> listLine1 = new ArrayList<>();
         List<Button> listLine2 = new ArrayList<>();
@@ -75,6 +74,8 @@ public class VkBot extends LongPollBot implements AbstractBot {
             listLine2.add(new TextButton(Button.Color.PRIMARY, new TextButton.Action(z)));
         allKey.add(listLine1);
         allKey.add(listLine2);
+        if(line1[0].equals("0"))
+            return new Keyboard(new ArrayList<>());
         return new Keyboard(allKey);
     }
 

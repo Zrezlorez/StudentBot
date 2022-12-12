@@ -8,11 +8,10 @@ import org.algiri.bots.VkBot;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 public class Main {
-    public static boolean isTest = true;
+    public static boolean isTest = false;
     public static void main(String[] args) {
-        System.out.println("\nБот включен!");
+        System.out.println("Bot enabled!");
         ExecutorService tgThread = Executors.newSingleThreadExecutor();
         ExecutorService vkThread = Executors.newSingleThreadExecutor();
         tgThread.execute(new TgBot()::run);

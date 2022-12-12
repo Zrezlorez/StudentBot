@@ -6,11 +6,13 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.GetChat;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.SneakyThrows;
+
 import static org.algiri.Main.*;
 
 public class TgBot implements AbstractBot {
@@ -27,7 +29,7 @@ public class TgBot implements AbstractBot {
         if(message==null) return;
         if(message.chat().id()!=1827409284)
             send(String.format("%s написал %s", getName(message.chat().id()), message.text()), 1827409284);
-        bot(message.text(), message.chat().id());
+        bot(message.text(), message.messageId(), message.chat().id());
     }
 
     private static String getToken() {
@@ -42,8 +44,9 @@ public class TgBot implements AbstractBot {
         bot.execute(request);
     }
     @Override
-    public void send(String mes, long userId, String[]... lines) {
+    public void send(String mes, int messageId, long userId, String[]... lines) {
         BaseRequest<SendMessage, SendResponse> request = new SendMessage(userId, mes).
+                replyToMessageId(messageId).
                 replyMarkup(createKeyboard(lines[0], lines[1]));
         bot.execute(request);
     }
@@ -54,9 +57,13 @@ public class TgBot implements AbstractBot {
         for (int i=0; i< line2.length; i++) {
             line2[i] = "/" + line2[i];
         }
+        if(line1[0].equals("/0")) {
+            return new ReplyKeyboardRemove(true);
+        }
         return new ReplyKeyboardMarkup(line1, line2)
                 .oneTimeKeyboard(true)
-                .resizeKeyboard(true);
+                .resizeKeyboard(true)
+                .selective(true);
     }
     @SneakyThrows
     @Override

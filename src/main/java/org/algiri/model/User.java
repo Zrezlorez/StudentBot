@@ -23,7 +23,7 @@ public class User {
                 .replace("/", "");
         this.id = id;
         userData = DataBase.getINSTANCE().getUserData(id);
-        isConv = id<0 || (id>2000000004 && id<2000000100);
+        isConv = id<0 || (id>2000000000 && id<2000001000);
     }
 
     public String register() {

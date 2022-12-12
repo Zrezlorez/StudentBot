@@ -23,7 +23,7 @@ public class Lesson {
         this.name = name;
         this.group = group;
         this.isNumerator = isNumerator;
-        teacher = Pattern.compile("[А-Я][а-я]+ [А-Я].[А-Я].", Pattern.MULTILINE).matcher(name).group(0);
+        //teacher = Pattern.compile("[А-Я][а-я]+ [А-Я].[А-Я].", Pattern.MULTILINE).matcher(name).group(0);
     }
     public Lesson(){}
 
