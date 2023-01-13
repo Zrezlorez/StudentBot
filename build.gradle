@@ -20,7 +20,6 @@ tasks.withType(JavaCompile) {
 }
 dependencies {
     implementation 'com.github.yvasyliev:java-vk-bots-longpoll-api:3.4.7'
-    implementation 'org.postgresql:postgresql:42.5.0'
     implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation 'com.github.pengrad:java-telegram-bot-api:6.2.0'
@@ -28,6 +27,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+    implementation 'org.xerial:sqlite-jdbc:3.40.0.0'
+
 }
 
 test {

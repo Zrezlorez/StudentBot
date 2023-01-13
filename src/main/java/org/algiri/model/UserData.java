@@ -6,27 +6,15 @@ import lombok.Setter;
 public class UserData {
     @Getter
     @Setter
-    long id;
+    private long id;
     @Getter
     @Setter
-    String group;
+    private int groupId;
     @Getter
     @Setter
-    String name;
+    private String name;
 
 
-    public UserData(long id, String group, String name) {
-        this.id = id;
-        this.group = group;
-        this.name = name;
-
-    }
-    public UserData() {}
-
-    public boolean isNull() {
-        return id==0;
-    }
-    public boolean isHaveGroup() {
-        return !group.equals("?");
-    }
+    public UserData(long id, String group, String name) {}
+    public UserData(){}
 }

@@ -1,10 +1,10 @@
 package org.algiri.bots;
 
-import org.algiri.DataBase;
+import org.algiri.data.DataBase;
 import org.algiri.model.Function;
-import org.algiri.Parser;
+import org.algiri.data.Parser;
 import org.algiri.model.Lesson;
-import org.algiri.model.User;
+import org.algiri.data.User;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -20,27 +20,7 @@ public interface AbstractBot {
 
 
     LocalDateTime date1 = LocalDate.of(2022, 9, 5).atStartOfDay();
-    List<String> GROUPNAME_LIST = new ArrayList<>(){{
-        add("ис211");
-        add("ис212");
-        add("ис213");
-        add("ис214");
-        add("ис215");
-        add("то221");
-        add("то222");
-        add("то223");
-        add("ис223");
-        add("ис224");
-        add("ис225");
-        add("ис226");
-        add("ис227");
-        add("лх221");
-        add("лх222");
-        add("лх223");
-        add("лх224");
-    }};
     default void bot(String mes, int messageId, long userId) {
-        boolean isNumerator = getNumerator();
         if(mes==null) return;
         DataBase bd =  DataBase.getINSTANCE();
         User user = new User(mes, userId);
@@ -48,9 +28,11 @@ public interface AbstractBot {
         String[] line2 = {"Сбросить", "Донат", "Удалить"};
         // обработка регистрации пользователя
         try {
-            String answer = user.register();
-            if(answer!=null) {
-                send(answer, messageId, userId, line1, line2);
+            if(user.getUserData().getId() == 0) {
+                user.register();
+            }
+            if(user.getUserData().getGroupId() < 2) {
+                send(user.changeGroup(), messageId, userId, line1, line2);
                 return;
             }
 
@@ -62,7 +44,7 @@ public interface AbstractBot {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT+3"));
         int today = LocalDate.now().getDayOfWeek().getValue()-1;
         Function function = null;
-        String pr = "";
+        String teacherName = "";
         // обработка команд
         try {
             switch (user.getMessage().split(" ")[0]) {
@@ -99,7 +81,12 @@ public interface AbstractBot {
                     }
                 }
                 case "препод" -> {
-                    pr = user.getMessage().split(" ")[1];
+                    var message = user.getMessage().split(" ");
+                    if(message.length<2) {
+                        send("Пожалуйста, после команды препод укажите его фамилию. Пример: /препод Силонов", messageId, userId);
+                        return;
+                    }
+                    teacherName = message[1];
                     function = Function.TEACHER;
                 }
                 case "удалить" -> {
@@ -120,8 +107,8 @@ public interface AbstractBot {
 
             }
             if(function!=null) {
-                List<Lesson> info = bd.getTimeTableData(isNumerator, function, user.getUserData().getGroup());
-                String timetable = getStringTimetable(info, function, today, pr);
+                List<Lesson> info = bd.getTimeTable(getNumerator(), user.getUserData().getGroupId());
+                String timetable = getStringTimetable(info, function, today, teacherName);
                 if(timetable.isEmpty()) {
                     send("По вашему запросу нет пар", userId);
                     return;
@@ -135,14 +122,18 @@ public interface AbstractBot {
     }
 
 
-    private static String getStringTimetable(List<Lesson> list, Function function, int today, String pr) {
+    private static String getStringTimetable(List<Lesson> list, Function function, int today, String teacherName) {
         StringBuilder result = new StringBuilder();
         int day = -1;
         String str;
         for (Lesson lesson : list) {
             switch (function) {
                 case TEACHER -> {
-                    if(lesson.getDay()==today && lesson.getTeacher().toLowerCase().contains(pr)) {
+                    if((lesson.getDay()==today || lesson.getDay()==today+1) && lesson.getTeacher().toLowerCase().contains(teacherName)) {
+                        if(day!=lesson.getDay()){
+                            day = lesson.getDay();
+                            result.append(Parser.days.get(day)).append("\n\n");
+                        }
                         str = String.format("Группа %s, %s-%s: %s\n\n",
                                 lesson.getGroup(),
                                 lesson.getTimeStart(),
