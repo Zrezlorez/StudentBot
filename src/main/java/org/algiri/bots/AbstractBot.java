@@ -107,7 +107,7 @@ public interface AbstractBot {
 
             }
             if(function!=null) {
-                List<Lesson> info = bd.getTimeTable(getNumerator(), user.getUserData().getGroupId());
+                List<Lesson> info = bd.getTimeTable(getNumerator(), user.getUserData().getGroupId(), function);
                 String timetable = getStringTimetable(info, function, today, teacherName);
                 if(timetable.isEmpty()) {
                     send("По вашему запросу нет пар", userId);
