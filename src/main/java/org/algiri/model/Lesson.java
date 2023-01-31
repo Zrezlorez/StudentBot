@@ -1,14 +1,22 @@
 package org.algiri.model;
 
+import lombok.Getter;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lesson {
-    private int day;
-    private String timeStart;
-    private String timeEnd;
-    private String name;
-    private String group;
+    @Getter
+    private final int day;
+    @Getter
+    private final String timeStart;
+    @Getter
+    private final String timeEnd;
+    @Getter
+    private final String name;
+    @Getter
+    private final String group;
+    @Getter
     private String teacher = "";
 
 
@@ -25,30 +33,6 @@ public class Lesson {
         if (matcher.find()) {
             teacher = matcher.group(0);
         }
-    }
-
-    public String getTeacher() {
-        return teacher;
-    }
-
-    public int getDay() {
-        return day;
-    }
-
-    public String getTimeStart() {
-        return timeStart;
-    }
-
-    public String getTimeEnd() {
-        return timeEnd;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getGroup() {
-        return group;
     }
     public boolean isNumerator() {
         return isNumerator;

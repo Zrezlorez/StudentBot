@@ -1,19 +1,18 @@
-package org.algiri.data;
+package org.algiri.model;
 
 
 import lombok.Getter;
-import org.algiri.model.UserData;
-
+import org.algiri.data.DataBase;
 
 
 public class User {
     @Getter
     private UserData userData;
     @Getter
-    private String message;
-    private long id;
+    private final String message;
+    private final long id;
     @Getter
-    private boolean isConv;
+    private final boolean isConv;
 
     public User(String message, long id) {
         this.message = message.toLowerCase()
@@ -22,7 +21,7 @@ public class User {
                 .trim();
         this.id = id;
         userData = DataBase.getINSTANCE().getUserData(id);
-        isConv = id<0 || (id>2000000000 && id<2000001000);
+        isConv = id < 0 || (id > 2000000000 && id < 2000001000);
     }
 
     public void register() {
